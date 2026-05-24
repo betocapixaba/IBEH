@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Facebook, Instagram, Youtube } from 'lucide-react';
+import { MapPin, Phone, Mail, Facebook } from 'lucide-react';
 import { ChurchSettings, Service } from '../types';
 
 interface FooterProps {
@@ -25,7 +25,7 @@ export default function Footer({ settings, services }: FooterProps) {
               Unidos en fe, esperanza y caridad. Una comunidad dedicada a la transformación de vidas a través de la Palabra de Dios.
             </p>
             <div className="flex space-x-4 pt-1">
-              {[Facebook, Instagram, Youtube].map((Icon, i) => (
+              {[Facebook].map((Icon, i) => (
                 <div key={i} className="group cursor-pointer">
                   <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-church-gold group-hover:border-church-gold transition-all duration-500">
                     <Icon className="w-4 h-4 text-slate-300 group-hover:text-church-navy transition-colors" />

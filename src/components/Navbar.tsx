@@ -27,29 +27,29 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onAdminToggle
   return (
     <nav className="fixed w-full z-50 px-4 pt-6">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white/70 backdrop-blur-2xl border border-white/50 shadow-soft rounded-[2.5rem] px-8 py-3">
-          <div className="flex justify-between items-center h-16 sm:h-20">
-            <div className="flex items-center gap-5 cursor-pointer group" onClick={() => setActiveTab('home')}>
+        <div className="bg-white/70 backdrop-blur-2xl border border-white/50 shadow-soft rounded-[2.5rem] px-6 py-2">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center gap-4 cursor-pointer group" onClick={() => setActiveTab('home')}>
               <div className="relative">
                 <div className="absolute inset-0 bg-church-gold/10 blur-xl group-hover:bg-church-gold/30 transition-all rounded-full" />
                 {settings.logoUrl ? (
                   <img 
                     src={settings.logoUrl} 
                     alt="Logo" 
-                    className="relative w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-2xl border border-white shadow-soft transition-transform group-hover:scale-105"
+                    className="relative w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-2xl border border-white shadow-soft transition-transform group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-church-navy rounded-2xl text-white shadow-soft">
-                    <Church className="w-6 h-6" />
+                  <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-church-navy rounded-2xl text-white shadow-soft">
+                    <Church className="w-5 h-5" />
                   </div>
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="text-church-navy font-serif font-black text-base sm:text-xl leading-none tracking-tight">
+                <span className="text-church-navy font-serif font-black text-sm sm:text-lg leading-none tracking-tight">
                   {settings.name ? settings.name.split(" ").slice(0, 3).join(" ") : "Iglesia Bautista"}
                 </span>
-                <span className="text-church-gold font-sans font-black text-[8px] sm:text-[10px] tracking-[0.3em] uppercase opacity-90 mt-1">
+                <span className="text-church-gold font-sans font-black text-[7px] sm:text-[9px] tracking-[0.3em] uppercase opacity-90 mt-0.5">
                   {settings.name ? settings.name.split(" ").slice(3).join(" ") : "Emanuel Hartford"}
                 </span>
               </div>

@@ -8,18 +8,18 @@ interface GalleryProps {
 
 export default function Gallery({ items }: GalleryProps) {
   return (
-    <div className="pt-40 pb-32 max-w-7xl mx-auto px-6">
-      <div className="text-center mb-24 space-y-8 max-w-3xl mx-auto">
-        <div className="flex flex-col items-center gap-4">
+    <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
+      <div className="text-center mb-12 space-y-4 max-w-3xl mx-auto">
+        <div className="flex flex-col items-center gap-2">
            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Memorias Compartidas</span>
-           <h1 className="text-5xl md:text-7xl font-serif font-black text-church-navy leading-tight">Momentos de Bendición</h1>
+           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Momentos de Bendición</h1>
         </div>
-        <p className="text-slate-500 text-xl leading-relaxed font-medium">
+        <p className="text-slate-500 text-lg leading-relaxed font-medium">
           Un vistazo a la vibrante vida de nuestra iglesia a través de los años. Foto y video de nuestros encuentros más significativos.
         </p>
       </div>
 
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+      <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
         {items.length > 0 ? items.map((item, idx) => (
           <motion.div
             key={item.id}

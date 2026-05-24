@@ -8,18 +8,18 @@ interface EventsProps {
 
 export default function Events({ events }: EventsProps) {
   return (
-    <div className="pt-40 pb-32 max-w-7xl mx-auto px-6">
-      <div className="text-center mb-24 space-y-8 max-w-3xl mx-auto">
-        <div className="flex flex-col items-center gap-4">
+    <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
+      <div className="text-center mb-12 space-y-4 max-w-3xl mx-auto">
+        <div className="flex flex-col items-center gap-2">
            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Calendario de Actividades</span>
-           <h1 className="text-5xl md:text-7xl font-serif font-black text-church-navy leading-tight">Próximos Eventos</h1>
+           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Próximos Eventos</h1>
         </div>
-        <p className="text-slate-500 text-xl leading-relaxed font-medium">
+        <p className="text-slate-500 text-lg leading-relaxed font-medium">
           Mantente al tanto de todas nuestras actividades especiales, conferencias y reuniones grupales.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {events.length > 0 ? events.map((event, idx) => (
           <motion.div
             key={event.id}
@@ -43,30 +43,30 @@ export default function Events({ events }: EventsProps) {
                </div>
             </div>
             
-            <div className="p-10 flex-grow flex flex-col space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-3xl font-serif font-bold text-church-navy leading-tight group-hover:text-church-gold transition-colors">{event.title}</h3>
-                <p className="text-slate-500 text-base leading-relaxed font-medium line-clamp-3">
+            <div className="p-8 flex-grow flex flex-col space-y-4">
+              <div className="space-y-3">
+                <h3 className="text-2xl font-serif font-bold text-church-navy leading-tight group-hover:text-church-gold transition-colors">{event.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed font-medium line-clamp-3">
                   {event.description}
                 </p>
               </div>
               
-              <div className="pt-8 border-t border-slate-50 space-y-4 mt-auto">
-                <div className="flex items-center gap-4 text-xs font-bold text-slate-400 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-church-gold" />
+              <div className="pt-6 border-t border-slate-50 space-y-3 mt-auto">
+                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 tracking-wide">
+                  <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
+                    <Calendar className="w-3.5 h-3.5 text-church-gold" />
                   </div>
                   <span>{event.date}</span>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-bold text-slate-400 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-church-gold" />
+                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 tracking-wide">
+                  <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
+                    <Clock className="w-3.5 h-3.5 text-church-gold" />
                   </div>
                   <span>{event.time || '19:00'}</span>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-bold text-slate-400 tracking-wide">
-                  <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-church-gold" />
+                <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 tracking-wide">
+                  <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
+                    <MapPin className="w-3.5 h-3.5 text-church-gold" />
                   </div>
                   <span>{event.location || 'Santuario Principal'}</span>
                 </div>

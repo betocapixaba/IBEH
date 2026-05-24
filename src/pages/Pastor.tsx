@@ -3,8 +3,8 @@ import { Quote } from 'lucide-react';
 
 export default function Pastor() {
   return (
-    <div className="pt-48 pb-32 max-w-7xl mx-auto px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <motion.div
            initial={{ opacity: 0, scale: 0.95 }}
            animate={{ opacity: 1, scale: 1 }}
@@ -33,25 +33,25 @@ export default function Pastor() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="space-y-12"
+          className="space-y-8"
         >
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
                <div className="h-px w-6 bg-church-gold" />
-               <span className="text-church-gold font-black capitalize tracking-widest text-xs">Liderazgo Espiritual</span>
+               <span className="text-church-gold font-black capitalize tracking-widest text-[10px]">Liderazgo Espiritual</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-serif font-black text-church-navy leading-tight">Pastor <br /><span className="text-church-gold italic font-normal underline decoration-slate-100 underline-offset-8">Principal</span></h1>
-            <p className="text-2xl font-serif text-slate-400">Rev. Juan Carlos Pérez</p>
+            <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Pastor <br /><span className="text-church-gold italic font-normal underline decoration-slate-100 underline-offset-8">Principal</span></h1>
+            <p className="text-xl font-serif text-slate-400">Rev. Juan Carlos Pérez</p>
           </div>
 
-          <div className="relative p-12 bg-white rounded-[3rem] border border-slate-50 shadow-soft italic text-xl text-slate-600 leading-relaxed group">
-            <Quote className="absolute -top-6 -left-6 w-16 h-16 text-church-gold/10 group-hover:text-church-gold/20 transition-colors" />
+          <div className="relative p-8 bg-white rounded-[2.5rem] border border-slate-50 shadow-soft italic text-lg text-slate-600 leading-relaxed group">
+            <Quote className="absolute -top-4 -left-4 w-12 h-12 text-church-gold/10 group-hover:text-church-gold/20 transition-colors" />
             <p className="relative z-10">
               "Nuestra verdadera pasión es ver vidas transformadas radicalmente por el poder restaurador del Evangelio. En Emanuel no solo encontrarás una congregación, sino un hogar donde crecemos juntos en el amor de Cristo."
             </p>
           </div>
 
-          <div className="space-y-8 text-slate-500 text-lg leading-relaxed font-medium">
+          <div className="space-y-6 text-slate-500 text-base leading-relaxed font-medium">
             <p>
               El Reverendo Juan Carlos Pérez ha dedicado más de tres décadas al servicio del Reino de Dios, enfocándose en la enseñanza profunda de las Escrituras y el cuidado pastoral. Su ministerio se caracteriza por un compromiso inquebrantable con la Gran Comisión y la formación de discípulos que impacten positivamente su entorno.
             </p>

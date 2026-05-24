@@ -12,18 +12,18 @@ export default function Ministries() {
   ];
 
   return (
-    <div className="pt-40 pb-32 max-w-7xl mx-auto px-6">
-      <div className="text-center mb-24 space-y-8 max-w-3xl mx-auto">
-        <div className="flex flex-col items-center gap-4">
+    <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
+      <div className="text-center mb-12 space-y-4 max-w-3xl mx-auto">
+        <div className="flex flex-col items-center gap-2">
            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Servicio y Crecimiento</span>
-           <h1 className="text-5xl md:text-7xl font-serif font-black text-church-navy leading-tight">Nuestros Ministerios</h1>
+           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Nuestros Ministerios</h1>
         </div>
-        <p className="text-slate-500 text-xl leading-relaxed font-medium">
+        <p className="text-slate-500 text-lg leading-relaxed font-medium">
           Hay un lugar diseñado por Dios para que Tú contribuyas. Descubre cómo puedes servir y ser edificado en nuestra gran familia.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {ministries.map((min, idx) => (
           <motion.div
             key={idx}
@@ -31,19 +31,19 @@ export default function Ministries() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1, duration: 0.6 }}
             viewport={{ once: true }}
-            className="group relative bg-white p-10 rounded-[3rem] border border-slate-100 shadow-soft hover:shadow-strong transition-all duration-500"
+            className="group relative bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-soft hover:shadow-strong transition-all duration-500"
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-church-gold/10 transition-colors" />
             
             <div className="relative z-10">
-              <div className="w-16 h-16 bg-slate-50 rounded-[1.5rem] flex items-center justify-center text-church-navy mb-8 border border-slate-100 group-hover:bg-church-navy group-hover:text-white transition-all duration-500">
-                <min.icon className="w-8 h-8" />
+              <div className="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center text-church-navy mb-6 border border-slate-100 group-hover:bg-church-navy group-hover:text-white transition-all duration-500">
+                <min.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl md:text-3xl font-serif font-bold mb-4 group-hover:text-church-gold transition-colors">{min.name}</h3>
-              <p className="text-slate-500 leading-relaxed font-medium">{min.desc}</p>
+              <h3 className="text-2xl font-serif font-bold mb-3 group-hover:text-church-gold transition-colors">{min.name}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">{min.desc}</p>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-slate-50 flex items-center justify-between">
+            <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between">
                <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Más info</span>
                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-church-gold group-hover:text-white transition-all">
                   <HandHeart className="w-4 h-4" />
