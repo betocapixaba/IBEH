@@ -29,7 +29,20 @@ export default function App() {
     name: "Iglesia Bautista Emanuel Hartford",
     address: "449 Park Street, Hartford - CT 06106",
     phone: "(860) 555-0123",
-    email: "info@emanuelhartford.org"
+    email: "info@emanuelhartford.org",
+    mission: "Exaltar el nombre de Jesucristo y extender Su Reino a través de la predicación del evangelio a todas las naciones y el discipulado integral.",
+    vision: "Ser una comunidad vibrante y transformadora que impacte Hartford con el poder del Espíritu Santo, restaurando vidas y familias.",
+    values: [
+      { label: 'Fe Bíblica', color: 'bg-church-gold' },
+      { label: 'Amor Fraternal', color: 'bg-red-400' },
+      { label: 'Excelencia en el Servicio', color: 'bg-church-navy' }
+    ],
+    historySteps: [
+      { id: '1', year: '1985', title: 'Semilla de Fe', description: 'Nuestra iglesia nació de un pequeño grupo de oración en un hogar familiar, impulsado por un hambre inmensa de la presencia de Dios.' },
+      { id: '2', year: '1992', title: 'Fundamentos Sólidos', description: 'Después de años de perseverancia, establecimos nuestra primera sede propia, convirtiéndonos en un punto de referencia espiritual para la ciudad.' },
+      { id: '3', year: '2005', title: 'Nueva Generación', description: 'Lanzamos ministerios enfocados en la juventud con el objetivo de equipar a los líderes del mañana bajo los principios bíblicos.' },
+      { id: '4', year: 'Hoy', title: 'Luz Continua', description: 'Seguimos creciendo y sirviendo a Hartford, extendiendo el amor de Cristo a través de misiones locales y mundiales.' }
+    ]
   });
   
   const [services, setServices] = useState<Service[]>([]);
@@ -45,7 +58,14 @@ export default function App() {
     const settingsRef = doc(db, 'settings', 'main');
     const unsubSettings = onSnapshot(settingsRef, (snapshot) => {
       if (snapshot.exists()) {
-        setSettings(snapshot.data() as ChurchSettings);
+        const data = snapshot.data();
+        setSettings(prev => ({ 
+          ...prev, 
+          ...data,
+          // Ensure arrays and nested objects are properly merged or at least preserved if missing in data
+          historySteps: data.historySteps || prev.historySteps,
+          values: data.values || prev.values
+        }));
       } else {
         // Init default settings if not exists
         setDoc(settingsRef, settings);
@@ -108,7 +128,7 @@ export default function App() {
   const featuredEvent = events.find(e => e.isFeatured) || events[0];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans selection:bg-church-gold/30">
+    <div className="min-h-screen bg-[#F1EFD9]/60 flex flex-col font-sans selection:bg-church-gold/30">
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={(id) => { setActiveTab(id); setIsAdminMode(false); }} 
@@ -137,7 +157,7 @@ export default function App() {
               />
             )}
             {(activeTab === 'history' || activeTab === 'about') && (
-              <About activeSection={activeTab as any} />
+              <About activeSection={activeTab as any} settings={settings} />
             )}
             {activeTab === 'ministries' && <Ministries />}
             {activeTab === 'pastor' && <Pastor />}

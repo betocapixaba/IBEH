@@ -14,7 +14,7 @@
 
 @layer base {
   body {
-    @apply font-sans bg-slate-50 text-slate-800 antialiased selection:bg-church-gold/20;
+    @apply font-sans bg-[#F1EFD9]/80 text-slate-800 antialiased selection:bg-church-gold/20;
   }
   
   h1, h2, h3, h4, h5, h6 {

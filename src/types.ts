@@ -1,3 +1,10 @@
+export interface HistoryStep {
+  id: string;
+  year: string;
+  title: string;
+  description: string;
+}
+
 export interface ChurchSettings {
   name: string;
   address: string;
@@ -5,6 +12,10 @@ export interface ChurchSettings {
   email: string;
   logoUrl?: string;
   heroUrl?: string;
+  historySteps?: HistoryStep[];
+  mission?: string;
+  vision?: string;
+  values?: { label: string; color: string }[];
 }
 
 export interface AdminAccount {

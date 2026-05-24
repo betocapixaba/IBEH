@@ -70,10 +70,10 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
         </div>
 
         {/* Floating Stat/Quick Link */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-12 text-church-navy font-sans text-[10px] uppercase tracking-[0.3em] font-black">
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-12 text-black font-sans text-[10px] uppercase tracking-[0.3em] font-black">
            <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-church-gold" /> Culto Dominical 10:00 AM</div>
            <div className="w-px h-4 bg-slate-200" />
-           <div className="flex items-center gap-3"><MapPin className="w-4 h-4 text-church-gold" /> Hartford, CT</div>
+           <div className="flex items-center gap-3"><MapPin className="w-4 h-4 text-church-gold" /> {settings.address ? settings.address.split(',')[0] : 'Hartford, CT'}</div>
         </div>
       </section>
 
