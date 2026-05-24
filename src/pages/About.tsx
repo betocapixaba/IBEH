@@ -49,7 +49,7 @@ export default function About({ activeSection, settings }: AboutProps) {
                 {historySteps.map((step, idx) => (
                    <div key={step.id} className={`flex flex-col md:flex-row gap-8 items-center ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
                     <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left space-y-2">
-                       <span className="text-5xl font-serif font-black text-slate-100 group-hover:text-church-gold/20 transition-colors">{step.year}</span>
+                       <span className="text-5xl font-serif font-black text-slate-300 group-hover:text-church-gold/20 transition-colors">{step.year}</span>
                        <div className="space-y-2">
                          <h3 className="text-2xl font-serif font-bold text-church-navy">{step.title}</h3>
                          <p className="text-slate-500 text-sm leading-relaxed font-medium">{step.description}</p>
