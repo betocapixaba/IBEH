@@ -1,0 +1,70 @@
+{
+  "entities": {
+    "ChurchSettings": {
+      "title": "Church Settings",
+      "description": "Global settings for the church website",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" }
+      },
+      "required": ["name", "address", "phone"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Scheduled church service",
+      "type": "object",
+      "properties": {
+        "day": { "type": "string" },
+        "time": { "type": "string" },
+        "description": { "type": "string" }
+      },
+      "required": ["day", "time"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Church event or activity",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "isFeatured": { "type": "boolean" }
+      },
+      "required": ["title", "date", "imageUrl"]
+    },
+    "GalleryItem": {
+      "title": "Gallery Item",
+      "description": "Photo or video from a church event",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "date": { "type": "string" },
+        "url": { "type": "string" },
+        "type": { "type": "string", "enum": ["photo", "video"] }
+      },
+      "required": ["title", "date", "url", "type"]
+    }
+  },
+  "firestore": {
+    "/settings/main": {
+      "schema": "ChurchSettings",
+      "description": "Primary church information"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Weekly services"
+    },
+    "/events/{eventId}": {
+      "schema": "Event",
+      "description": "Church events"
+    },
+    "/gallery/{itemId}": {
+      "schema": "GalleryItem",
+      "description": "Media gallery items"
+    }
+  }
+}

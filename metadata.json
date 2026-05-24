@@ -1,0 +1,8 @@
+{
+  "name": "Iglesia Bautista Emanuel Hartford",
+  "description": "Sitio web oficial de la Iglesia Bautista Emanuel Hartford. Información sobre cultos, eventos, ministerios y nuestra historia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
