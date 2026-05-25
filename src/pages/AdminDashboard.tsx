@@ -21,6 +21,7 @@ import {
   UserPlus, 
   Eye, 
   EyeOff, 
+  Target,
   Sparkles,
   CheckCircle,
   Home as HomeIcon,
@@ -972,26 +973,44 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Misión de la Iglesia</label>
-                       <textarea 
-                         rows={4}
-                         placeholder="Describa el propósito fundamental de la iglesia..."
-                         value={tempSettings.mission}
-                         onChange={(e) => setTempSettings({ ...tempSettings, mission: e.target.value })}
-                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
-                       />
+                  {/* Mission & Vision Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                    <div className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-soft transition-all hover:shadow-strong relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-24 h-24 bg-church-gold/5 rounded-full blur-2xl -mr-12 -mt-12 transition-all group-hover:bg-church-gold/10" />
+                       <div className="relative z-10 space-y-4">
+                         <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-church-gold/10 flex items-center justify-center text-church-gold">
+                             <Target className="w-4 h-4" />
+                           </div>
+                           <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Misión de la Iglesia</label>
+                         </div>
+                         <textarea 
+                           rows={5}
+                           placeholder="Describa el propósito fundamental de la iglesia..."
+                           value={tempSettings.mission || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, mission: e.target.value })}
+                           className="w-full p-4 bg-slate-50/50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium placeholder:text-slate-300 transition-all resize-none"
+                         />
+                       </div>
                     </div>
-                    <div className="space-y-2">
-                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Visión de la Iglesia</label>
-                       <textarea 
-                         rows={4}
-                         placeholder="¿Hacia dónde se dirige la iglesia en los próximos años?"
-                         value={tempSettings.vision}
-                         onChange={(e) => setTempSettings({ ...tempSettings, vision: e.target.value })}
-                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
-                       />
+
+                    <div className="group bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-soft transition-all hover:shadow-strong relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-24 h-24 bg-church-navy/5 rounded-full blur-2xl -mr-12 -mt-12 transition-all group-hover:bg-church-navy/10" />
+                       <div className="relative z-10 space-y-4">
+                         <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-church-navy/10 flex items-center justify-center text-church-navy">
+                             <Eye className="w-4 h-4" />
+                           </div>
+                           <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Visión de la Iglesia</label>
+                         </div>
+                         <textarea 
+                           rows={5}
+                           placeholder="¿Hacia dónde se dirige la iglesia en los próximos años?"
+                           value={tempSettings.vision || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, vision: e.target.value })}
+                           className="w-full p-4 bg-slate-50/50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-navy/20 text-slate-800 font-medium placeholder:text-slate-300 transition-all resize-none"
+                         />
+                       </div>
                     </div>
                   </div>
 

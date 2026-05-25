@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Calendar, Clock, MapPin, ArrowRight, Church } from 'lucide-react';
+import { Calendar, Clock, MapPin, ArrowRight, Church, Sparkles } from 'lucide-react';
 import { Service, Event, ChurchSettings } from '../types';
 
 interface HomeProps {
@@ -72,8 +72,6 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
         {/* Floating Stat/Quick Link */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-12 text-black font-sans text-[10px] uppercase tracking-[0.3em] font-black">
            <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-church-gold" /> Culto Dominical 10:00 AM</div>
-           <div className="w-px h-4 bg-slate-200" />
-           <div className="flex items-center gap-3"><MapPin className="w-4 h-4 text-church-gold" /> {settings.address ? settings.address.split(',')[0] : 'Hartford, CT'}</div>
         </div>
       </section>
 
@@ -107,39 +105,21 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
           </div>
 
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-church-navy text-white rounded-[2.5rem] p-8 flex flex-col justify-between shadow-strong group overflow-hidden relative">
+            <div className="bg-church-navy text-white rounded-[2.5rem] p-8 flex flex-col justify-between shadow-strong group overflow-hidden relative min-h-[300px]">
               <div className="absolute top-0 right-0 w-32 h-32 bg-church-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-church-gold/20 transition-all" />
               <div className="relative z-10">
                 <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 transition-transform">
-                  <MapPin className="w-6 h-6 text-church-gold" />
+                  <Sparkles className="w-6 h-6 text-church-gold" />
                 </div>
-                <h3 className="text-2xl font-serif font-black mb-4">Ubicación</h3>
-                <p className="text-slate-300 text-sm leading-relaxed font-medium">
-                  {settings.address || '449 Park Street, Hartford - CT 06106'}
+                <h3 className="text-2xl font-serif font-black mb-4">¡Bienvenidos!</h3>
+                <p className="text-slate-200 text-base leading-relaxed font-medium italic">
+                  "Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida."
                 </p>
-                <div className="mt-6 space-y-3">
-                  {settings.phone && (
-                    <div className="flex items-center gap-4 text-slate-400 text-xs">
-                       <div className="w-1 h-1 rounded-full bg-church-gold" /> {settings.phone}
-                    </div>
-                  )}
-                  {settings.email && (
-                    <div className="flex items-center gap-4 text-slate-400 text-xs">
-                       <div className="w-1 h-1 rounded-full bg-church-gold" /> {settings.email}
-                    </div>
-                  )}
+                <div className="mt-6 flex items-center gap-2">
+                   <div className="h-px w-8 bg-church-gold/30" />
+                   <span className="text-church-gold font-black uppercase tracking-[0.2em] text-[10px]">Emanuel Hartford</span>
                 </div>
               </div>
-
-              <button 
-                onClick={() => {
-                  const query = encodeURIComponent(settings.address);
-                  window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
-                }}
-                className="relative z-10 w-full mt-8 py-4 bg-white text-church-navy font-black rounded-xl hover:bg-church-gold hover:text-white transition-all uppercase text-[10px] tracking-widest"
-              >
-                Obtener Direcciones
-              </button>
             </div>
           </div>
         </div>
