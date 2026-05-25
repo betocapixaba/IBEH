@@ -179,7 +179,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                   <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-3 border border-white/10 group-hover:scale-110 transition-transform">
                     <Sparkles className="w-4 h-4 text-church-gold" />
                   </div>
-                  <h3 className="text-lg font-serif font-black mb-1">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
+                  <h3 style={{ color: '#dca300' }} className="text-lg font-serif font-black mb-1">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
                   <p className="text-slate-200 text-xs leading-relaxed font-medium italic">
                     "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
                   </p>
