@@ -16,6 +16,14 @@ export interface ChurchSettings {
   mission?: string;
   vision?: string;
   values?: { label: string; color: string }[];
+  pastorName?: string;
+  pastorImageUrl?: string;
+  pastorQuote?: string;
+  pastorBio?: string;
+  youtubeUrl?: string;
+  facebookUrl?: string;
+  welcomeTitle?: string;
+  welcomeMessage?: string;
 }
 
 export interface AdminAccount {
@@ -48,6 +56,7 @@ export interface Event {
   isFeatured: boolean;
   time?: string;
   location?: string;
+  longDescription?: string;
 }
 
 export interface GalleryItem {

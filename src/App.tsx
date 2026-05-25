@@ -5,6 +5,7 @@ import {
   onSnapshot, 
   doc, 
   setDoc,
+  deleteDoc, 
   query,
   limit 
 } from 'firebase/firestore';
@@ -42,7 +43,15 @@ export default function App() {
       { id: '2', year: '1992', title: 'Fundamentos Sólidos', description: 'Después de años de perseverancia, establecimos nuestra primera sede propia, convirtiéndonos en un punto de referencia espiritual para la ciudad.' },
       { id: '3', year: '2005', title: 'Nueva Generación', description: 'Lanzamos ministerios enfocados en la juventud con el objetivo de equipar a los líderes del mañana bajo los principios bíblicos.' },
       { id: '4', year: 'Hoy', title: 'Luz Continua', description: 'Seguimos creciendo y sirviendo a Hartford, extendiendo el amor de Cristo a través de misiones locales y mundiales.' }
-    ]
+    ],
+    pastorName: "Rev. Juan Carlos Pérez",
+    pastorImageUrl: "https://images.unsplash.com/photo-1544168190-79c17527004f?auto=format&fit=crop&q=80&w=800",
+    pastorQuote: "Nuestra verdadera pasión es ver vidas transformadas radicalmente por el poder restaurador del Evangelio. En Emanuel no solo encontrarás una congregación, sino un hogar donde crecemos juntos en el amor de Cristo.",
+    pastorBio: "El Reverendo Juan Carlos Pérez ha dedicado más de tres décadas al servicio del Reino de Dios, enfocándose en la enseñanza profunda de las Escrituras y el cuidado pastoral.\n\nSu ministerio se caracteriza por un compromiso inquebrantable con la Gran Comisión y la formación de discípulos que impacten positivamente su entorno. En Hartford, ha liderado durante diez años una visión de crecimiento espiritual genuino y alcance comunitario, creyendo firmemente que cada persona tiene un propósito divino esperando ser activado en el cuerpo de Cristo.",
+    youtubeUrl: "https://youtube.com",
+    facebookUrl: "https://www.facebook.com/IBEHARTFORD",
+    welcomeTitle: "¡Bienvenidos!",
+    welcomeMessage: "Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida."
   });
   
   const [services, setServices] = useState<Service[]>([]);
@@ -86,6 +95,25 @@ export default function App() {
     const unsubEvents = onSnapshot(collection(db, 'events'), (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Event));
       setEvents(data);
+      
+      // Auto-Cleanup: Delete events 2 hours after start time
+      const now = new Date();
+      data.forEach(async (event) => {
+        if (!event.date) return;
+        try {
+          // Attempt to parse date and time safely
+          // ISO format (YYYY-MM-DD) + T + HH:mm
+          const eventStart = new Date(`${event.date}T${event.time || '00:00'}:00`);
+          if (isNaN(eventStart.getTime())) return; // Skip if invalid date
+
+          const expiryTime = new Date(eventStart.getTime() + (2 * 60 * 60 * 1000));
+          if (now > expiryTime) {
+            await deleteDoc(doc(db, 'events', event.id));
+          }
+        } catch (e) {
+          console.error("Cleanup error:", e);
+        }
+      });
       
       if (snap.empty) {
         setDoc(doc(collection(db, 'events')), { 
@@ -160,7 +188,7 @@ export default function App() {
               <About activeSection={activeTab as any} settings={settings} />
             )}
             {activeTab === 'ministries' && <Ministries />}
-            {activeTab === 'pastor' && <Pastor />}
+            {activeTab === 'pastor' && <Pastor settings={settings} />}
             {activeTab === 'events' && <Events events={events} />}
             {activeTab === 'gallery' && <Gallery items={gallery} />}
           </>

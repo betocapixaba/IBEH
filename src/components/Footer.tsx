@@ -25,13 +25,16 @@ export default function Footer({ settings, services }: FooterProps) {
               Unidos en fe, esperanza y caridad. Una comunidad dedicada a la transformación de vidas a través de la Palabra de Dios.
             </p>
             <div className="flex space-x-4 pt-1">
-              {[Facebook].map((Icon, i) => (
-                <div key={i} className="group cursor-pointer">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-church-gold group-hover:border-church-gold transition-all duration-500">
-                    <Icon className="w-4 h-4 text-slate-300 group-hover:text-church-navy transition-colors" />
-                  </div>
+              <a 
+                href={settings.facebookUrl || "https://www.facebook.com/IBEHARTFORD"} 
+                target="_blank" 
+                rel="noreferrer"
+                className="group cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-church-gold group-hover:border-church-gold transition-all duration-500">
+                  <Facebook className="w-4 h-4 text-slate-300 group-hover:text-church-navy transition-colors" />
                 </div>
-              ))}
+              </a>
             </div>
           </div>
 

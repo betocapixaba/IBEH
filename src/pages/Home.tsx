@@ -111,9 +111,9 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
                 <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 transition-transform">
                   <Sparkles className="w-6 h-6 text-church-gold" />
                 </div>
-                <h3 className="text-2xl font-serif font-black mb-4">¡Bienvenidos!</h3>
+                <h3 className="text-2xl font-serif font-black mb-4">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
                 <p className="text-slate-200 text-base leading-relaxed font-medium italic">
-                  "Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida."
+                  "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
                 </p>
                 <div className="mt-6 flex items-center gap-2">
                    <div className="h-px w-8 bg-church-gold/30" />

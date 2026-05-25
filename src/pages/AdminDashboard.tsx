@@ -101,6 +101,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
   const [eventFormLocation, setEventFormLocation] = useState('');
   const [eventFormDescription, setEventFormDescription] = useState('');
   const [eventFormImageUrl, setEventFormImageUrl] = useState('');
+  const [eventFormLongDescription, setEventFormLongDescription] = useState('');
 
   // Gallery form and edit selection states
   const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
@@ -117,6 +118,8 @@ export default function AdminDashboard({ settings, services, events, gallery, on
   const [galleryUploadLoading, setGalleryUploadLoading] = useState(false);
   const [logoUploadLoading, setLogoUploadLoading] = useState(false);
   const [heroUploadLoading, setHeroUploadLoading] = useState(false);
+  const [pastorUploadLoading, setPastorUploadLoading] = useState(false);
+  const [eventUploadLoading, setEventUploadLoading] = useState(false);
 
   // Custom confirmation modal states
   const [confirmModal, setConfirmModal] = useState<{
@@ -326,6 +329,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
     setEventFormLocation('Santuario Principal');
     setEventFormDescription('');
     setEventFormImageUrl('');
+    setEventFormLongDescription('');
     setIsEventFormOpen(true);
   };
 
@@ -337,6 +341,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
     setEventFormLocation(event.location || 'Santuario Principal');
     setEventFormDescription(event.description || '');
     setEventFormImageUrl(event.imageUrl || '');
+    setEventFormLongDescription(event.longDescription || '');
     setIsEventFormOpen(true);
   };
 
@@ -361,6 +366,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
         time: eventFormTime,
         location: eventFormLocation,
         description: eventFormDescription,
+        longDescription: eventFormLongDescription,
         imageUrl: finalImg,
         isFeatured
       });
@@ -640,6 +646,138 @@ export default function AdminDashboard({ settings, services, events, gallery, on
     }
   };
 
+  const handlePastorUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setPastorUploadLoading(true);
+
+    const processFile = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const max_size = 1200;
+
+            if (width > height) {
+              if (width > max_size) {
+                height *= max_size / width;
+                width = max_size;
+              }
+            } else {
+              if (height > max_size) {
+                width *= max_size / height;
+                height = max_size;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              try {
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                resolve(dataUrl);
+              } catch (err) {
+                console.error(err);
+                resolve(event.target?.result as string);
+              }
+            } else {
+              resolve(event.target?.result as string);
+            }
+          };
+          img.onerror = () => {
+            reject(new Error('Error al procesar la imagen del pastor.'));
+          };
+          img.src = event.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error('Error al leer el archivo.'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    try {
+      const dataUrl = await processFile(file);
+      setTempSettings((prev) => ({ ...prev, pastorImageUrl: dataUrl }));
+    } catch (err) {
+      console.error(err);
+      alert('Error al cargar la foto del pastor.');
+    } finally {
+      setPastorUploadLoading(false);
+    }
+  };
+
+  const handleEventImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setEventUploadLoading(true);
+
+    const processFile = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const max_size = 1200;
+
+            if (width > height) {
+              if (width > max_size) {
+                height *= max_size / width;
+                width = max_size;
+              }
+            } else {
+              if (height > max_size) {
+                width *= max_size / height;
+                height = max_size;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0, width, height);
+              try {
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                resolve(dataUrl);
+              } catch (err) {
+                console.error(err);
+                resolve(event.target?.result as string);
+              }
+            } else {
+              resolve(event.target?.result as string);
+            }
+          };
+          img.onerror = () => {
+            reject(new Error('Error al procesar la imagen del evento.'));
+          };
+          img.src = event.target?.result as string;
+        };
+        reader.onerror = () => reject(new Error('Error al leer el archivo.'));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    try {
+      const dataUrl = await processFile(file);
+      setEventFormImageUrl(dataUrl);
+    } catch (err) {
+      console.error(err);
+      alert('Error al cargar la foto del evento.');
+    } finally {
+      setEventUploadLoading(false);
+    }
+  };
+
   const saveGalleryForm = async (e: FormEvent) => {
     e.preventDefault();
     if (!loggedUser?.permissions.gallery) return;
@@ -809,6 +947,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
         <div className="w-full lg:w-72 space-y-3 shrink-0">
           {[
             { id: 'settings', name: 'Identidad y Logo', icon: SettingsIcon, allowed: loggedUser.permissions.settings },
+            { id: 'pastor', name: 'Pastor y Redes', icon: Sparkles, allowed: loggedUser.permissions.settings },
             { id: 'history', name: 'Historia', icon: History, allowed: loggedUser.permissions.settings },
             { id: 'services', name: 'Horarios de Culto', icon: Clock, allowed: loggedUser.permissions.services },
             { id: 'events', name: 'Eventos y Actividades', icon: Calendar, allowed: loggedUser.permissions.events },
@@ -840,6 +979,123 @@ export default function AdminDashboard({ settings, services, events, gallery, on
         <div className="flex-1 bg-white rounded-[3.5rem] border border-slate-50 shadow-strong p-10 md:p-16 min-h-[700px] transition-all relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-slate-50/50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 -z-0" />
           <div className="relative z-10 w-full">
+            {/* pastor PANEL */}
+            {activePanel === 'pastor' && loggedUser.permissions.settings && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-px w-6 bg-church-gold" />
+                    <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Liderazgo</span>
+                  </div>
+                  <h3 className="text-4xl font-serif font-black text-church-navy">Perfil del Pastor</h3>
+                  <p className="text-slate-400 text-lg font-medium">Gestione la imagen, biografía y redes sociales del liderazgo principal.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Nombre del Pastor</label>
+                       <input 
+                         type="text" 
+                         value={tempSettings.pastorName || ''}
+                         onChange={(e) => setTempSettings({ ...tempSettings, pastorName: e.target.value })}
+                         placeholder="Ej: Rev. Juan Carlos Pérez"
+                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                       />
+                    </div>
+
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Cita / Mensaje (Rectángulo Blanco)</label>
+                       <textarea 
+                         rows={4}
+                         value={tempSettings.pastorQuote || ''}
+                         onChange={(e) => setTempSettings({ ...tempSettings, pastorQuote: e.target.value })}
+                         placeholder="Ingresa una frase inspiradora o mensaje de bienvenida..."
+                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium italic"
+                       />
+                    </div>
+
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Biografía / Historia</label>
+                       <textarea 
+                         rows={8}
+                         value={tempSettings.pastorBio || ''}
+                         onChange={(e) => setTempSettings({ ...tempSettings, pastorBio: e.target.value })}
+                         placeholder="Describe la trayectoria y visión del pastor..."
+                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium text-sm leading-relaxed"
+                       />
+                    </div>
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Fotografía del Pastor</label>
+                      <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center group">
+                        {tempSettings.pastorImageUrl ? (
+                          <>
+                            <img src={tempSettings.pastorImageUrl} className="w-full h-full object-cover" alt="Pastor Preview" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                               <label htmlFor="pastor-upload" className="cursor-pointer bg-white text-church-navy px-6 py-3 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl">Cambiar Imagen</label>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-center p-8">
+                             <Camera className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                             <p className="text-slate-400 text-sm font-medium">Haga clic abajo para subir una foto profesional</p>
+                             <label htmlFor="pastor-upload" className="mt-6 inline-block cursor-pointer bg-church-navy text-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl hover:bg-church-gold transition-colors">Seleccionar Archivo</label>
+                          </div>
+                        )}
+                        {pastorUploadLoading && (
+                          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-20">
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="w-10 h-10 border-4 border-church-gold border-t-transparent rounded-full animate-spin"></div>
+                              <span className="text-xs font-black text-church-navy uppercase tracking-widest">Subiendo...</span>
+                            </div>
+                          </div>
+                        )}
+                        <input type="file" id="pastor-upload" className="hidden" accept="image/*" onChange={handlePastorUpload} />
+                      </div>
+                    </div>
+
+                    <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 space-y-6">
+                       <h4 className="font-serif font-bold text-church-navy text-xl">Canales Digitales</h4>
+                       <div className="space-y-4">
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Canal de YouTube (Predicaciones)</label>
+                            <input 
+                              type="text" 
+                              value={tempSettings.youtubeUrl || ''}
+                              onChange={(e) => setTempSettings({ ...tempSettings, youtubeUrl: e.target.value })}
+                              placeholder="https://youtube.com/..."
+                              className="w-full p-3 bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/20 text-slate-800 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Página de Facebook</label>
+                            <input 
+                              type="text" 
+                              value={tempSettings.facebookUrl || ''}
+                              onChange={(e) => setTempSettings({ ...tempSettings, facebookUrl: e.target.value })}
+                              placeholder="https://facebook.com/..."
+                              className="w-full p-3 bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 text-sm"
+                            />
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-8">
+                  <button 
+                    onClick={saveSettings}
+                    className="px-12 py-5 bg-church-navy text-white rounded-[2rem] font-bold text-xs uppercase tracking-[0.2em] shadow-strong hover:bg-church-gold transition-all active:scale-95 flex items-center gap-3"
+                  >
+                    <Save className="w-5 h-5" /> Guardar Perfil del Pastor
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* history PANEL */}
             {activePanel === 'history' && loggedUser.permissions.settings && (
               <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -940,6 +1196,29 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                       onChange={(e) => setTempSettings({ ...tempSettings, name: e.target.value })}
                       className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Título de Bienvenida (Página Inicio)</label>
+                       <input 
+                         type="text" 
+                         value={tempSettings.welcomeTitle || ''}
+                         onChange={(e) => setTempSettings({ ...tempSettings, welcomeTitle: e.target.value })}
+                         placeholder="Ej: ¡Bienvenidos!"
+                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Mensaje de Bienvenida (Página Inicio)</label>
+                       <textarea 
+                         rows={2}
+                         value={tempSettings.welcomeMessage || ''}
+                         onChange={(e) => setTempSettings({ ...tempSettings, welcomeMessage: e.target.value })}
+                         placeholder="Ingresa el saludo para los visitantes..."
+                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                       />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1253,23 +1532,47 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">URL de la Imagen</label>
-                      <input 
-                        type="text" 
-                        placeholder="Deja en blanco para imagen por defecto"
-                        value={eventFormImageUrl}
-                        onChange={(e) => setEventFormImageUrl(e.target.value)}
-                        className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 text-sm font-mono"
-                      />
+                    <div className="space-y-4 md:col-span-2">
+                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Fotografía del Evento</label>
+                      <div className="relative aspect-video rounded-3xl overflow-hidden bg-white border-2 border-dashed border-slate-200 flex flex-col items-center justify-center group/evtimg">
+                        {eventFormImageUrl ? (
+                          <>
+                            <img src={eventFormImageUrl} className="w-full h-full object-cover" alt="Event Preview" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/evtimg:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                               <label htmlFor="event-upload" className="cursor-pointer bg-white text-church-navy px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-xl">Cambiar Imagen</label>
+                               <button 
+                                 type="button"
+                                 onClick={() => setEventFormImageUrl('')}
+                                 className="bg-red-500 text-white px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-xl"
+                               >
+                                 Eliminar
+                               </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="text-center p-8">
+                             <Camera className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                             <p className="text-slate-400 text-xs font-medium">Haga clic abajo para subir una foto representativa del evento</p>
+                             <label htmlFor="event-upload" className="mt-4 inline-block cursor-pointer bg-church-navy text-white px-6 py-3 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-xl hover:bg-church-gold transition-colors">Seleccionar Archivo</label>
+                          </div>
+                        )}
+                        {eventUploadLoading && (
+                          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-20">
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="w-8 h-8 border-4 border-church-gold border-t-transparent rounded-full animate-spin"></div>
+                              <span className="text-[10px] font-black text-church-navy uppercase tracking-widest">Subiendo...</span>
+                            </div>
+                          </div>
+                        )}
+                        <input type="file" id="event-upload" className="hidden" accept="image/*" onChange={handleEventImageUpload} />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha (Día del Evento)</label>
                       <input 
-                        type="text" 
+                        type="date" 
                         required
-                        placeholder="Ej. Sábado 12 de Junio"
                         value={eventFormDate}
                         onChange={(e) => setEventFormDate(e.target.value)}
                         className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
@@ -1279,8 +1582,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Horario de Inicio</label>
                       <input 
-                        type="text" 
-                        placeholder="Ej. 7:00 PM o 19:30"
+                        type="time" 
                         value={eventFormTime}
                         onChange={(e) => setEventFormTime(e.target.value)}
                         className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
@@ -1299,13 +1601,24 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Descripción del Evento</label>
+                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Descripción Breve</label>
                       <textarea 
-                        rows={3}
-                        placeholder="Escriba los detalles o pasajes del evento..."
+                        rows={2}
+                        placeholder="Escriba un resumen corto (aparece en la tarjeta)..."
                         value={eventFormDescription}
                         onChange={(e) => setEventFormDescription(e.target.value)}
                         className="w-full p-4 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                      />
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Información Detallada (Rectángulo de Evento)</label>
+                      <textarea 
+                        rows={4}
+                        placeholder="Escriba aquí los detalles extensos, ministerios invitados, requerimientos, etc..."
+                        value={eventFormLongDescription}
+                        onChange={(e) => setEventFormLongDescription(e.target.value)}
+                        className="w-full p-4 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium bg-church-gold/5"
                       />
                     </div>
                   </div>

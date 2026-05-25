@@ -38,8 +38,12 @@ export default function Events({ events }: EventsProps) {
                <div className="absolute inset-0 bg-gradient-to-t from-church-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                
                <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-2xl flex flex-col items-center border border-white shadow-soft">
-                  <span className="text-[10px] uppercase font-black text-church-gold tracking-widest leading-none mb-1">PROX</span>
-                  <span className="text-2xl font-serif font-black text-church-navy leading-none">24</span>
+                  <span className="text-[10px] uppercase font-black text-church-gold tracking-widest leading-none mb-1">
+                    {event.date ? new Date(event.date + 'T12:00:00').toLocaleDateString('es-ES', { month: 'short' }).replace('.', '') : 'PROX'}
+                  </span>
+                  <span className="text-2xl font-serif font-black text-church-navy leading-none">
+                    {event.date ? new Date(event.date + 'T12:00:00').getDate() : '24'}
+                  </span>
                </div>
             </div>
             
@@ -49,6 +53,14 @@ export default function Events({ events }: EventsProps) {
                 <p className="text-slate-500 text-sm leading-relaxed font-medium line-clamp-3">
                   {event.description}
                 </p>
+                {event.longDescription && (
+                  <div className="mt-4 p-5 bg-church-gold/5 rounded-2xl border border-church-gold/10 relative overflow-hidden group/info">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-church-gold/10 rounded-full blur-2xl -mr-8 -mt-8 transition-colors group-hover/info:bg-church-gold/20" />
+                    <p className="text-church-navy text-xs leading-relaxed font-semibold relative z-10 whitespace-pre-wrap">
+                      {event.longDescription}
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="pt-6 border-t border-slate-50 space-y-3 mt-auto">
