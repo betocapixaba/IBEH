@@ -35,16 +35,16 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
             <div className="flex items-center justify-center gap-4 mb-2">
                <div className="h-px w-8 bg-church-gold" />
                <span className="font-sans text-church-gold font-black tracking-[0.4em] uppercase text-[10px] sm:text-xs">
-                 Nuestra Casa es Tu Casa
+                 {settings.heroBadge || 'Nuestra Casa es Tu Casa'}
                </span>
                <div className="h-px w-8 bg-church-gold" />
             </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif font-black text-white leading-[1.1] tracking-tight">
-              Donde la fe encuentra <br className="hidden md:block" />
-              <span className="italic font-normal text-church-gold/90">una familia.</span>
+              {settings.heroTitle || 'Donde la fe encuentra'} <br className="hidden md:block" />
+              <span className="italic font-normal text-church-gold/90">{settings.heroTitleHighlight || 'una familia.'}</span>
             </h1>
             <p className="text-slate-200 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed opacity-90">
-              Ubicados en el corazón de Hartford, somos una comunidad dedicada a exaltar a Cristo y servir a nuestro prójimo con amor.
+              {settings.heroSubtitle || 'Ubicados en el corazón de Hartford, somos una comunidad dedicada a exaltar a Cristo y servir a nuestro prójimo con amor.'}
             </p>
           </motion.div>
           

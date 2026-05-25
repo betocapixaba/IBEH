@@ -1198,7 +1198,56 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <div className="flex items-center gap-3">
+                       <Sparkles className="w-5 h-5 text-church-gold" />
+                       <h3 className="font-serif font-black text-church-navy">Textos de la Portada (Hero)</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Breve frase superior (Badge)</label>
+                         <input 
+                           type="text" 
+                           value={tempSettings.heroBadge || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, heroBadge: e.target.value })}
+                           placeholder="Ej: Bienvenido a nuestra comunidad"
+                           className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Título Principal (Primera Parte)</label>
+                         <input 
+                           type="text" 
+                           value={tempSettings.heroTitle || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, heroTitle: e.target.value })}
+                           placeholder="Ej: Donde la fe encuentra"
+                           className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Texto Resaltado (Cursiva/Dorado)</label>
+                         <input 
+                           type="text" 
+                           value={tempSettings.heroTitleHighlight || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, heroTitleHighlight: e.target.value })}
+                           placeholder="Ej: una familia."
+                           className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium italic text-church-gold"
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Subtítulo Descriptivo</label>
+                         <textarea 
+                           rows={2}
+                           value={tempSettings.heroSubtitle || ''}
+                           onChange={(e) => setTempSettings({ ...tempSettings, heroSubtitle: e.target.value })}
+                           placeholder="Un lugar para crecer en fe..."
+                           className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium"
+                         />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
                     <div className="space-y-2">
                        <label className="text-xs font-bold uppercase text-slate-400 tracking-wider">Título de Bienvenida (Página Inicio)</label>
                        <input 

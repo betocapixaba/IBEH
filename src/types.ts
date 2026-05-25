@@ -24,6 +24,10 @@ export interface ChurchSettings {
   facebookUrl?: string;
   welcomeTitle?: string;
   welcomeMessage?: string;
+  heroBadge?: string;
+  heroTitle?: string;
+  heroTitleHighlight?: string;
+  heroSubtitle?: string;
 }
 
 export interface AdminAccount {

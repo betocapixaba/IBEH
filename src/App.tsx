@@ -51,7 +51,11 @@ export default function App() {
     youtubeUrl: "https://youtube.com",
     facebookUrl: "https://www.facebook.com/IBEHARTFORD",
     welcomeTitle: "¡Bienvenidos!",
-    welcomeMessage: "Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida."
+    welcomeMessage: "Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.",
+    heroBadge: "Nuestra Casa es Tu Casa",
+    heroTitle: "Donde la fe encuentra",
+    heroTitleHighlight: "una familia.",
+    heroSubtitle: "Ubicados en el corazón de Hartford, somos una comunidad dedicada a exaltar a Cristo y servir a nuestro prójimo con amor."
   });
   
   const [services, setServices] = useState<Service[]>([]);
