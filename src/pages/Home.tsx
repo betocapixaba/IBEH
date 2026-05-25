@@ -1,19 +1,21 @@
 import { motion } from 'motion/react';
-import { Calendar, Clock, MapPin, ArrowRight, Church, Sparkles } from 'lucide-react';
-import { Service, Event, ChurchSettings } from '../types';
+import { Calendar, Clock, MapPin, ArrowRight, Church, Sparkles, Bell } from 'lucide-react';
+import { Service, Event, ChurchSettings, QuickNotice } from '../types';
+import churchMapImg from '../assets/images/church_map_1779745801080.png';
 
 interface HomeProps {
   services: Service[];
-  featuredEvent?: Event;
+  events: Event[];
+  quickNotices: QuickNotice[];
   setActiveTab: (tab: string) => void;
   settings: ChurchSettings;
 }
 
-export default function Home({ services, featuredEvent, setActiveTab, settings }: HomeProps) {
+export default function Home({ services, events, quickNotices, setActiveTab, settings }: HomeProps) {
   return (
-    <div className="space-y-16 pb-12">
+    <div className="space-y-12 pb-8">
       {/* Hero Section - Refined */}
-      <section className="relative min-h-[85vh] flex items-center justify-center pt-16">
+      <section className="relative min-h-[65vh] flex items-center justify-center pt-16 py-12">
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img 
             src={settings.heroUrl || "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80&w=2000"} 
@@ -75,24 +77,63 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
         </div>
       </section>
 
+      {/* Quick Notices - Last-Minute Announcements */}
+      {quickNotices && quickNotices.length > 0 && (
+        <section className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col gap-1 items-center md:items-start text-center md:text-left mb-6">
+            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px] flex items-center gap-1.5 justify-center md:justify-start">
+              <Bell className="w-3.5 h-3.5 animate-bounce text-church-gold" /> Comunicados Último Minuto
+            </span>
+            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Avisos Especiales</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+            {quickNotices.map((notice) => (
+              <div 
+                key={notice.id} 
+                className={`${notice.widthClass || 'col-span-12'} ${notice.bgColor || 'bg-white'} ${notice.heightClass || 'p-5 min-h-[160px]'} rounded-[2rem] shadow-soft border border-slate-100 flex flex-col justify-between transition-all hover:scale-[1.01] duration-300 relative overflow-hidden`}
+              >
+                {/* Decorative background accent for styling */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+                
+                <div className="space-y-2.5 relative z-10">
+                  <h3 className={`text-lg md:text-xl font-serif font-black ${notice.titleColor || 'text-church-navy'}`}>
+                    {notice.title}
+                  </h3>
+                  <p className={`text-xs md:text-sm ${notice.contentColor || 'text-slate-600'} whitespace-pre-line leading-relaxed font-medium`}>
+                    {notice.content}
+                  </p>
+                </div>
+                
+                <div className="mt-4 flex items-center justify-between text-[8px] font-mono tracking-wider uppercase opacity-50 relative z-10">
+                  <span className={notice.bgColor?.includes('text-white') || notice.bgColor?.includes('bg-[#1e293b]') || notice.bgColor?.includes('bg-[#1A2B48]') ? 'text-slate-300' : 'text-slate-500'}>Emanuel Hartford</span>
+                  <span className={notice.bgColor?.includes('text-white') || notice.bgColor?.includes('bg-[#1e293b]') || notice.bgColor?.includes('bg-[#1A2B48]') ? 'text-slate-300' : 'text-slate-500'}>
+                    {new Date(notice.createdAt || Date.now()).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Services Grid - Bento Style */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-8 bg-white rounded-[2.5rem] p-8 md:p-12 shadow-soft border border-slate-100 flex flex-col justify-between">
-            <div className="space-y-8">
-              <div className="flex flex-col gap-1">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div className="lg:col-span-8 bg-white rounded-[2rem] p-6 md:p-8 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div className="space-y-6">
+              <div className="flex flex-col gap-0.5">
                  <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Agenda Semanal</span>
-                 <h2 className="text-3xl md:text-4xl font-serif font-black text-church-navy">Nuestros Cultos</h2>
+                 <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Nuestros Cultos</h2>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {services.length > 0 ? services.map((service) => (
-                  <div key={service.id} className="group p-6 bg-slate-50/50 rounded-[1.5rem] border border-slate-100 hover:border-church-gold hover:bg-white transition-all duration-300">
-                    <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 group-hover:bg-church-gold group-hover:text-white transition-colors duration-300">
+                  <div key={service.id} className="group p-5 bg-slate-50/50 rounded-[1.25rem] border border-slate-100 hover:border-church-gold hover:bg-white transition-all duration-300">
+                    <div className="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:bg-church-gold group-hover:text-white transition-colors duration-300">
                        <Clock className="w-4 h-4 text-church-gold group-hover:text-white" />
                     </div>
-                    <p className="font-sans font-black text-church-navy uppercase tracking-widest text-[9px] mb-1">{service.day}</p>
-                    <h4 className="text-xl font-serif font-bold mb-2">{service.time}</h4>
+                    <p className="font-sans font-black text-church-navy uppercase tracking-widest text-[9px] mb-0.5">{service.day}</p>
+                    <h4 className="text-lg font-serif font-bold mb-1">{service.time}</h4>
                     <p className="text-slate-500 text-xs leading-relaxed">{service.description}</p>
                   </div>
                 )) : (
@@ -101,23 +142,78 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
                   </div>
                 )}
               </div>
+
+              {/* Facebook Live Callout Infobox */}
+              <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/60 flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-church-gold font-black uppercase tracking-widest text-[9px]">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-church-gold/60 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-church-gold"></span>
+                    </span>
+                    Servicio Dominical
+                  </div>
+                  <p className="text-xs md:text-sm text-church-navy/80 font-bold leading-relaxed">
+                    Acompañe nuestro servicio dominical en Facebook Live. Comienza a las 11:15 de la mañana.
+                  </p>
+                </div>
+                <div className="px-4 py-2 bg-church-navy text-white text-[10px] uppercase tracking-widest font-black rounded-xl whitespace-nowrap self-start md:self-auto text-center shadow-sm">
+                  ¡Usted es nuestro invitado!
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-church-navy text-white rounded-[2.5rem] p-8 flex flex-col justify-between shadow-strong group overflow-hidden relative min-h-[300px]">
+          <div className="lg:col-span-4">
+            <div className="bg-church-navy text-white rounded-[2rem] p-6 flex flex-col justify-between shadow-strong group overflow-hidden relative h-full min-h-[380px]">
               <div className="absolute top-0 right-0 w-32 h-32 bg-church-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-church-gold/20 transition-all" />
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-6 border border-white/10 group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-6 h-6 text-church-gold" />
+              <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+                <div>
+                  <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-5 h-5 text-church-gold" />
+                  </div>
+                  <h3 className="text-xl font-serif font-black mb-1.5">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
+                  <p className="text-slate-200 text-xs leading-relaxed font-medium italic">
+                    "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
+                  </p>
                 </div>
-                <h3 className="text-2xl font-serif font-black mb-4">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
-                <p className="text-slate-200 text-base leading-relaxed font-medium italic">
-                  "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
-                </p>
-                <div className="mt-6 flex items-center gap-2">
-                   <div className="h-px w-8 bg-church-gold/30" />
-                   <span className="text-church-gold font-black uppercase tracking-[0.2em] text-[10px]">Emanuel Hartford</span>
+
+                {/* Map/Location section inside the rectangle */}
+                <div className="space-y-3">
+                  <a 
+                    href="https://www.google.com/maps/place/449+Washington+St,+Hartford,+CT+06106/@41.7479331,-72.6833788,17z/data=!4m6!3m5!1s0x89e653165a974109:0xb463cf67b1ef8efe!8m2!3d41.7479016!4d-72.6837422!16s%2Fg%2F11yhpl1j4c?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block relative rounded-2xl overflow-hidden border border-white/10 shadow-lg aspect-[1.8/1] w-full group/map hover:scale-[1.02] active:scale-[0.99] transition-transform duration-300"
+                    title="Ver en Google Maps"
+                  >
+                    <img 
+                      src={churchMapImg} 
+                      alt="Ubicación de la Iglesia Emanuel Hartford" 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover/map:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex items-end p-2.5">
+                      <div className="flex items-center gap-1.5 text-white">
+                        <MapPin className="w-3.5 h-3.5 text-church-gold shrink-0 animate-bounce" />
+                        <span className="text-[10px] font-bold tracking-wide truncate max-w-[200px]">
+                          449 Washington St, Hartford, CT
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-church-gold font-black uppercase tracking-[0.2em] text-[8px]">Emanuel Hartford</span>
+                    <a 
+                      href="https://www.google.com/maps/place/449+Washington+St,+Hartford,+CT+06106/@41.7479331,-72.6833788,17z/data=!4m6!3m5!1s0x89e653165a974109:0xb463cf67b1ef8efe!8m2!3d41.7479016!4d-72.6837422!16s%2Fg%2F11yhpl1j4c?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D"
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[#D4AF37] hover:text-white transition-colors"
+                    >
+                      Cómo Llegar <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -125,55 +221,63 @@ export default function Home({ services, featuredEvent, setActiveTab, settings }
         </div>
       </section>
 
-      {/* Featured Event - More Modern */}
-      {featuredEvent && (
-        <section className="max-w-6xl mx-auto px-6">
-          <div className="relative rounded-[3rem] overflow-hidden group shadow-strong">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="h-[300px] lg:h-auto overflow-hidden">
-                <img 
-                  src={featuredEvent.imageUrl} 
-                  alt={featuredEvent.title}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <div className="bg-white p-8 md:p-12 flex flex-col justify-center space-y-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-church-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-                <div className="space-y-3 relative z-10">
-                  <div className="inline-flex items-center gap-3 bg-slate-50 text-church-navy px-4 py-1.5 rounded-full text-[9px] font-black tracking-widest uppercase border border-slate-100">
-                    <Calendar className="w-3.5 h-3.5 text-church-gold" />
-                    <span>{featuredEvent.date} {featuredEvent.time ? ` | ${featuredEvent.time}` : ''}</span>
+      {/* Featured Events - More Modern */}
+      {events && events.length > 0 && (
+        <section className="max-w-6xl mx-auto px-6 space-y-8">
+          <div className="flex flex-col gap-0.5 text-center md:text-left">
+             <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Próximas Actividades</span>
+             <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Eventos Especiales</h2>
+          </div>
+          <div className="space-y-8">
+            {events.map((event) => (
+              <div key={event.id} className="relative rounded-[2rem] overflow-hidden group shadow-soft border border-slate-100">
+                <div className="grid grid-cols-1 lg:grid-cols-2">
+                  <div className="h-[220px] lg:h-auto lg:min-h-[280px] overflow-hidden">
+                    <img 
+                      src={event.imageUrl} 
+                      alt={event.title}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif font-black text-church-navy leading-tight">
-                    {featuredEvent.title}
-                  </h3>
-                  <p className="text-slate-500 text-base leading-relaxed line-clamp-3">
-                    {featuredEvent.description}
-                  </p>
+                  <div className="bg-white p-6 md:p-8 flex flex-col justify-center space-y-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-church-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+                    <div className="space-y-2 relative z-10">
+                      <div className="inline-flex items-center gap-2 bg-slate-50 text-church-navy px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase border border-slate-100">
+                        <Calendar className="w-3.5 h-3.5 text-church-gold" />
+                        <span>{event.date} {event.time ? ` | ${event.time}` : ''}</span>
+                      </div>
+                      <h3 className="text-2xl md:text-3xl font-serif font-black text-church-navy leading-tight">
+                        {event.title}
+                      </h3>
+                      <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">
+                        {event.description}
+                      </p>
+                    </div>
+                    <button 
+                      onClick={() => setActiveTab('events')}
+                      className="relative z-10 px-6 py-3 bg-church-navy text-white font-black rounded-full w-fit hover:bg-church-gold transition-all self-start uppercase text-[9px] tracking-widest shadow-xl shadow-church-navy/10"
+                    >
+                      Más Información
+                    </button>
+                  </div>
                 </div>
-                <button 
-                  onClick={() => setActiveTab('events')}
-                  className="relative z-10 px-8 py-4 bg-church-navy text-white font-black rounded-full w-fit hover:bg-church-gold transition-all self-start uppercase text-[10px] tracking-widest shadow-xl shadow-church-navy/10"
-                >
-                  Más Información
-                </button>
               </div>
-            </div>
+            ))}
           </div>
         </section>
       )}
 
       {/* Scripture Section - Centered Focus */}
       <section className="max-w-4xl mx-auto px-6 text-center">
-        <div className="space-y-6 py-12 px-8 bg-white rounded-[3rem] border border-slate-100 shadow-soft">
+        <div className="space-y-4 py-8 px-6 bg-white rounded-[2rem] border border-slate-100 shadow-soft">
           <div className="flex items-center justify-center text-church-gold opacity-30">
-             <Church className="w-10 h-10" />
+             <Church className="w-8 h-8" />
           </div>
-          <h2 className="text-2xl md:text-4xl font-serif font-bold italic text-church-navy/90 leading-tight">
+          <h2 className="text-xl md:text-3xl font-serif font-bold italic text-church-navy/90 leading-tight">
             "Porque yo sé muito bem os planos que tenho para vocês, planos de bem-estar..."
           </h2>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <p className="font-sans font-black text-church-gold uppercase tracking-[0.5em] text-[10px]">Jeremías 29:11</p>
             <p className="text-slate-400 text-xs italic">Santas Escrituras</p>
           </div>

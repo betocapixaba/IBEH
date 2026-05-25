@@ -79,3 +79,16 @@ export interface Ministry {
   iconName: string;
 }
 
+export interface QuickNotice {
+  id: string;
+  title: string;
+  content: string;
+  bgColor: string;
+  titleColor: string;
+  contentColor: string;
+  widthClass: string;
+  heightClass: string;
+  createdAt: string;
+}
+
+

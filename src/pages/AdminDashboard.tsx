@@ -7,7 +7,7 @@ import {
   setDoc,
   onSnapshot
 } from 'firebase/firestore';
-import { ChurchSettings, Service, Event, GalleryItem, AdminAccount, HistoryStep } from '../types';
+import { ChurchSettings, Service, Event, GalleryItem, AdminAccount, HistoryStep, QuickNotice } from '../types';
 import { 
   Plus, 
   Trash2, 
@@ -31,7 +31,8 @@ import {
   Pencil,
   MapPin,
   X,
-  History
+  History,
+  Bell
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -39,6 +40,7 @@ interface AdminDashboardProps {
   services: Service[];
   events: Event[];
   gallery: GalleryItem[];
+  quickNotices: QuickNotice[];
   onRefresh: () => void;
 }
 
@@ -56,7 +58,7 @@ const HERO_PRESETS = [
   { name: "Cruz Silueta", url: "https://images.unsplash.com/photo-1510150117199-2217e939c0aa?auto=format&fit=crop&q=80&w=2000" }
 ];
 
-export default function AdminDashboard({ settings, services, events, gallery, onRefresh }: AdminDashboardProps) {
+export default function AdminDashboard({ settings, services, events, gallery, quickNotices, onRefresh }: AdminDashboardProps) {
   // Authentication State
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -71,7 +73,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
 
   // Users Database State
   const [adminUsers, setAdminUsers] = useState<AdminAccount[]>([]);
-  const [activePanel, setActivePanel] = useState<'settings' | 'history' | 'services' | 'events' | 'gallery' | 'users'>('settings');
+  const [activePanel, setActivePanel] = useState<'settings' | 'pastor' | 'history' | 'services' | 'events' | 'gallery' | 'users' | 'notices'>('settings');
 
   // User management form state
   const [newUserId, setNewUserId] = useState('');
@@ -133,6 +135,17 @@ export default function AdminDashboard({ settings, services, events, gallery, on
     message: '',
     onConfirm: null
   });
+
+  // Quick notice manager states
+  const [editingNotice, setEditingNotice] = useState<QuickNotice | null>(null);
+  const [isNoticeFormOpen, setIsNoticeFormOpen] = useState(false);
+  const [noticeFormTitle, setNoticeFormTitle] = useState('');
+  const [noticeFormContent, setNoticeFormContent] = useState('');
+  const [noticeFormBgColor, setNoticeFormBgColor] = useState('bg-[#1A2B48] text-white');
+  const [noticeFormTitleColor, setNoticeFormTitleColor] = useState('text-[#D4AF37]');
+  const [noticeFormContentColor, setNoticeFormContentColor] = useState('text-slate-200');
+  const [noticeFormWidthClass, setNoticeFormWidthClass] = useState('col-span-12 md:col-span-4');
+  const [noticeFormHeightClass, setNoticeFormHeightClass] = useState('p-6 min-h-[180px]');
 
   const triggerConfirmation = (title: string, message: string, onConfirmAction: () => void) => {
     setConfirmModal({
@@ -384,10 +397,76 @@ export default function AdminDashboard({ settings, services, events, gallery, on
     if (!loggedUser?.permissions.events) return;
     triggerConfirmation(
       'Eliminar Evento',
-      '¿Está seguro de que desea eliminar este evento de forma permanente? No se podrá recuperar.',
+      '¿Está seguro de que desea eliminar este evento de forma permanente? No se poderá recuperar.',
       async () => {
         await deleteDoc(doc(db, 'events', id));
         onRefresh();
+      }
+    );
+  };
+
+  const openNoticeForm = (notice: QuickNotice | null = null) => {
+    if (notice) {
+      setEditingNotice(notice);
+      setNoticeFormTitle(notice.title);
+      setNoticeFormContent(notice.content);
+      setNoticeFormBgColor(notice.bgColor || 'bg-[#1A2B48] text-white');
+      setNoticeFormTitleColor(notice.titleColor || 'text-[#D4AF37]');
+      setNoticeFormContentColor(notice.contentColor || 'text-slate-200');
+      setNoticeFormWidthClass(notice.widthClass || 'col-span-12 md:col-span-4');
+      setNoticeFormHeightClass(notice.heightClass || 'p-6 min-h-[180px]');
+    } else {
+      setEditingNotice(null);
+      setNoticeFormTitle('');
+      setNoticeFormContent('');
+      setNoticeFormBgColor('bg-[#1A2B48] text-white');
+      setNoticeFormTitleColor('text-[#D4AF37]');
+      setNoticeFormContentColor('text-slate-200');
+      setNoticeFormWidthClass('col-span-12 md:col-span-4');
+      setNoticeFormHeightClass('p-6 min-h-[180px]');
+    }
+    setIsNoticeFormOpen(true);
+  };
+
+  const saveNoticeForm = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!loggedUser?.permissions.settings) return;
+    
+    if (!noticeFormTitle || !noticeFormContent) {
+      alert('O título e o conteúdo são obrigatórios.');
+      return;
+    }
+
+    try {
+      const id = editingNotice ? editingNotice.id : Math.random().toString(36).substring(2, 9);
+      const createdAt = editingNotice ? editingNotice.createdAt : new Date().toISOString();
+
+      await setDoc(doc(db, 'quick_notices', id), {
+        title: noticeFormTitle,
+        content: noticeFormContent,
+        bgColor: noticeFormBgColor,
+        titleColor: noticeFormTitleColor,
+        contentColor: noticeFormContentColor,
+        widthClass: noticeFormWidthClass,
+        heightClass: noticeFormHeightClass,
+        createdAt
+      });
+      
+      setIsNoticeFormOpen(false);
+      setEditingNotice(null);
+    } catch (e) {
+      console.error(e);
+      alert('Erro ao salvar o comunicado.');
+    }
+  };
+
+  const deleteNotice = async (id: string) => {
+    if (!loggedUser?.permissions.settings) return;
+    triggerConfirmation(
+      'Eliminar Comunicado',
+      '¿Está seguro de que desea eliminar este comunicado de última hora de forma permanente?',
+      async () => {
+        await deleteDoc(doc(db, 'quick_notices', id));
       }
     );
   };
@@ -952,6 +1031,7 @@ export default function AdminDashboard({ settings, services, events, gallery, on
             { id: 'services', name: 'Horarios de Culto', icon: Clock, allowed: loggedUser.permissions.services },
             { id: 'events', name: 'Eventos y Actividades', icon: Calendar, allowed: loggedUser.permissions.events },
             { id: 'gallery', name: 'Galería de Memorias', icon: Camera, allowed: loggedUser.permissions.gallery },
+            { id: 'notices', name: 'Avisos de Última Hora', icon: Bell, allowed: loggedUser.permissions.settings },
             { id: 'users', name: 'Cuentas de Acceso', icon: Users, allowed: loggedUser.role === 'super_admin' || loggedUser.permissions.accounts },
           ].map((panel) => {
             if (!panel.allowed) return null;
@@ -2194,6 +2274,311 @@ export default function AdminDashboard({ settings, services, events, gallery, on
                  </div>
 
                </div>
+            </div>
+          )}
+
+          {/* MANAGING QUICK NOTICES PANEL */}
+          {activePanel === 'notices' && loggedUser.permissions.settings && (
+            <div className="space-y-10 animate-in fade-in duration-300">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-serif font-bold text-church-navy">Mural de Avisos Rápidos</h3>
+                  <p className="text-slate-500 text-sm mt-1">Crie, dimensione e personalize retângulos coloridos de última hora para fixar na página principal da igreja.</p>
+                </div>
+                {!isNoticeFormOpen && (
+                  <button
+                    onClick={() => openNoticeForm(null)}
+                    className="flex items-center gap-2 px-6 py-3.5 bg-church-navy text-white hover:bg-church-navy/90 rounded-full font-bold text-xs uppercase tracking-widest transition-all shadow-md active:scale-95 shrink-0"
+                  >
+                    <Plus className="w-4 h-4" /> Novo Comunicado
+                  </button>
+                )}
+              </div>
+
+              {isNoticeFormOpen && (
+                <div className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-soft space-y-8 animate-in slide-in-from-top-4 duration-300">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <h4 className="font-serif font-bold text-lg text-church-navy flex items-center gap-2">
+                      <Bell className="w-5 h-5 text-church-gold animate-swing" />
+                      {editingNotice ? 'Editar Comunicado Especial' : 'Criar Novo Retângulo de Aviso'}
+                    </h4>
+                    <button 
+                      type="button"
+                      onClick={() => { setIsNoticeFormOpen(false); setEditingNotice(null); }}
+                      className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={saveNoticeForm} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    {/* Controls */}
+                    <div className="lg:col-span-7 space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Título do Comunicado</label>
+                        <input 
+                          type="text" 
+                          required
+                          placeholder="Ex: Reunião Extraordinária, Campanha de Doação, etc."
+                          value={noticeFormTitle}
+                          onChange={(e) => setNoticeFormTitle(e.target.value)}
+                          className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/30 font-medium text-slate-800 text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Mensagem / Conteúdo do Aviso</label>
+                        <textarea 
+                          required
+                          rows={4}
+                          placeholder="Escreva as informações detalhadas que a igreja precisa saber de imediato..."
+                          value={noticeFormContent}
+                          onChange={(e) => setNoticeFormContent(e.target.value)}
+                          className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/30 font-medium text-slate-800 text-sm min-h-[120px]"
+                        />
+                      </div>
+
+                      {/* Dimensionamento do Retângulo */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Largura do Painel</label>
+                          <select
+                            value={noticeFormWidthClass}
+                            onChange={(e) => setNoticeFormWidthClass(e.target.value)}
+                            className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/30 font-medium text-slate-800 text-sm"
+                          >
+                            <option value="col-span-12 md:col-span-3">Pequeno (1/4 da Linha)</option>
+                            <option value="col-span-12 md:col-span-4">Médio (1/3 da Linha)</option>
+                            <option value="col-span-12 md:col-span-6">Grande (Metade da Linha)</option>
+                            <option value="col-span-12">Banner Inteiro (Linha Completa)</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Altura / Espaçamento</label>
+                          <select
+                            value={noticeFormHeightClass}
+                            onChange={(e) => setNoticeFormHeightClass(e.target.value)}
+                            className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/30 font-medium text-slate-800 text-sm"
+                          >
+                            <option value="p-4 min-h-[140px]">Compacto (Apertado, poucos dados)</option>
+                            <option value="p-6 min-h-[200px]">Normal (Equilibrado)</option>
+                            <option value="p-10 min-h-[300px]">Espaçoso (Amplo, destaca o texto)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Cores Personalizadas */}
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <span className="text-xs font-bold uppercase text-slate-500 tracking-wider block">Escolha o Tema do Retângulo</span>
+                          <div className="flex flex-wrap gap-2.5">
+                            {[
+                              { label: 'Azul Escuro', val: 'bg-[#1A2B48] text-white' },
+                              { label: 'Ouro Real', val: 'bg-[#D4AF37] text-slate-900' },
+                              { label: 'Laranja Alerta', val: 'bg-orange-500 text-white' },
+                              { label: 'Cinza Suave', val: 'bg-[#f8fafc] text-slate-800 border border-slate-200' },
+                              { label: 'Coral Nobre', val: 'bg-[#fff1f2] text-rose-950 border border-rose-250' },
+                              { label: 'Sage Verde', val: 'bg-[#f0fdf4] text-emerald-950 border border-emerald-250' },
+                              { label: 'Roxo Vivo', val: 'bg-purple-600 text-white' },
+                              { label: 'Dark Charcoal', val: 'bg-[#1e293b] text-white' }
+                            ].map((preset) => (
+                              <button
+                                key={preset.val}
+                                type="button"
+                                onClick={() => setNoticeFormBgColor(preset.val)}
+                                className={`px-4 py-2 bg-white rounded-full text-xs font-semibold shadow-sm border transition-all ${
+                                  noticeFormBgColor === preset.val 
+                                    ? 'border-church-navy ring-2 ring-church-gold/30 bg-slate-100 scale-102 font-black_label'
+                                    : 'border-slate-200 hover:border-slate-400'
+                                }`}
+                              >
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold uppercase text-slate-500 tracking-wider block">Cor do Título</span>
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                { label: 'Ouro', val: 'text-[#D4AF37]' },
+                                { label: 'Branco', val: 'text-white' },
+                                { label: 'Marinho', val: 'text-[#1A2B48]' },
+                                { label: 'Carvão', val: 'text-slate-900' },
+                                { label: 'Vermelho', val: 'text-red-600' }
+                              ].map((item) => (
+                                <button
+                                  key={item.val}
+                                  type="button"
+                                  onClick={() => setNoticeFormTitleColor(item.val)}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm border transition-all ${
+                                    noticeFormTitleColor === item.val 
+                                      ? 'border-church-navy ring-2 ring-church-gold/35 bg-slate-100 font-bold'
+                                      : 'border-slate-100 hover:border-slate-300'
+                                  }`}
+                                >
+                                  {item.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold uppercase text-slate-500 tracking-wider block">Cor do Conteúdo</span>
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                { label: 'Claro', val: 'text-slate-200' },
+                                { label: 'Cinza', val: 'text-slate-500' },
+                                { label: 'Marinho', val: 'text-[#1A2B48]/90' },
+                                { label: 'Preto', val: 'text-slate-800' },
+                                { label: 'Fosco', val: 'text-slate-400' }
+                              ].map((item) => (
+                                <button
+                                  key={item.val}
+                                  type="button"
+                                  onClick={() => setNoticeFormContentColor(item.val)}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm border transition-all ${
+                                    noticeFormContentColor === item.val 
+                                      ? 'border-church-navy ring-2 ring-church-gold/35 bg-slate-100 font-bold'
+                                      : 'border-slate-100 hover:border-slate-300'
+                                  }`}
+                                >
+                                  {item.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                        <button
+                          type="submit"
+                          className="flex items-center gap-2 px-8 py-4 bg-church-navy hover:bg-church-navy/90 text-white font-bold rounded-full text-xs uppercase tracking-widest transition-all shadow-md active:scale-95"
+                        >
+                          <Save className="w-4 h-4" /> {editingNotice ? 'Atualizar Comunicado' : 'Publicar Comunicado'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setIsNoticeFormOpen(false); setEditingNotice(null); }}
+                          className="px-6 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-full text-xs uppercase tracking-widest transition-all"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Preview Area */}
+                    <div className="lg:col-span-5 flex flex-col justify-start">
+                      <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-150 space-y-4 sticky top-6">
+                        <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
+                          <Eye className="w-5 h-5 text-church-navy" />
+                          <span className="text-xs font-bold uppercase text-slate-500 tracking-wider">Vista Prévia Realista</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 italic">Este retângulo será exibido exatamente assim no topo da página principal:</p>
+                        
+                        {/* Notice Card Render Mock */}
+                        <div className="pt-2">
+                          <div className={`${noticeFormBgColor} ${noticeFormHeightClass} rounded-[2.25rem] shadow-soft border border-slate-100/30 flex flex-col justify-between transition-all relative overflow-hidden`}>
+                            <div className="space-y-2.5 relative z-10">
+                              <h3 className={`text-lg font-serif font-black ${noticeFormTitleColor}`}>
+                                {noticeFormTitle || 'Título de Exemplo'}
+                              </h3>
+                              <p className={`text-xs ${noticeFormContentColor} whitespace-pre-line leading-relaxed font-semibold`}>
+                                {noticeFormContent || 'Este é o conteúdo do aviso. Ele se ajustará ao tamanho escolhido por você.'}
+                              </p>
+                            </div>
+                            <div className="mt-4 flex items-center justify-between text-[8px] font-mono tracking-wider uppercase opacity-50 relative z-10">
+                              <span>Emanuel Hartford</span>
+                              <span>{new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Extra dimension feedback */}
+                        <div className="p-4 bg-white/80 rounded-2xl border border-slate-100 space-y-2 font-sans text-xs text-slate-650">
+                          <p>📐 <strong>Tamanho no Desktop:</strong> {
+                            noticeFormWidthClass.includes('col-span-3') ? '1/4 da Largura da Tela' :
+                            noticeFormWidthClass.includes('col-span-4') ? '1/3 da Largura da Tela' :
+                            noticeFormWidthClass.includes('col-span-6') ? 'Metade da Largura da Tela' : 'Banner de Tela Cheia'
+                          }</p>
+                          <p>📱 <strong>Tamanho no Celular:</strong> Ajusta-se dinamicamente para largura total preservando a legibilidade sem quebrar a tela!</p>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* LIST OF NOTICES COMPONENT */}
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-serif font-bold text-lg text-church-navy">Comunicados Ativos</h4>
+                  <p className="text-slate-500 text-xs mt-0.5">Clique em editar para ajustar o tamanho/cores ou remova avisos que já terminaram.</p>
+                </div>
+
+                {quickNotices && quickNotices.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {quickNotices.map((notice) => (
+                      <div key={notice.id} className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-soft flex flex-col justify-between gap-6">
+                        <div className="flex gap-4 items-start justify-between">
+                          <div className="space-y-1 w-full">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono tracking-wider bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold uppercase">
+                                {notice.widthClass?.includes('col-span-3') ? '1/4 L' : 
+                                 notice.widthClass?.includes('col-span-4') ? '1/3 L' :
+                                 notice.widthClass?.includes('col-span-6') ? '1/2 L' : 'Completa'}
+                              </span>
+                              <span className="text-[10px] font-mono tracking-wider bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold uppercase">
+                                {notice.heightClass?.includes('p-4') ? 'Compacto' : 
+                                 notice.heightClass?.includes('p-6') ? 'Normal' : 'Amplo'}
+                              </span>
+                            </div>
+                            <h5 className="font-serif font-bold text-base text-church-navy mt-1">{notice.title}</h5>
+                            <p className="text-slate-500 text-xs line-clamp-3">{notice.content}</p>
+                          </div>
+                        </div>
+
+                        {/* Miniature Preview swatch plus options */}
+                        <div className="flex items-center justify-between border-t border-slate-50 pt-4 mt-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Cores:</span>
+                            <div className={`w-5 h-5 rounded-full ${notice.bgColor?.split(' ')[0] || 'bg-slate-200'} border border-slate-150`} />
+                            {notice.titleColor && <div className={`w-3 h-3 rounded-full bg-slate-300 flex items-center justify-center font-bold text-[8px] border border-slate-150`} title="Texto" />}
+                          </div>
+                          
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => openNoticeForm(notice)}
+                              className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-church-navy transition-all"
+                              title="Editar Comunicado"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteNotice(notice.id)}
+                              className="p-2 bg-slate-50 hover:bg-red-50 rounded-xl text-slate-500 hover:text-red-600 transition-all"
+                              title="Excluir Comunicado"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-12 text-center bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200 space-y-3">
+                    <Bell className="w-10 h-10 text-slate-300 mx-auto animate-pulse" />
+                    <p className="text-slate-400 text-sm font-medium">Nenhum aviso de última hora publicado ainda.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

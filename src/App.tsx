@@ -9,7 +9,7 @@ import {
   query,
   limit 
 } from 'firebase/firestore';
-import { ChurchSettings, Service, Event, GalleryItem } from './types';
+import { ChurchSettings, Service, Event, GalleryItem, QuickNotice } from './types';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -61,6 +61,7 @@ export default function App() {
   const [services, setServices] = useState<Service[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [quickNotices, setQuickNotices] = useState<QuickNotice[]>([]);
 
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
@@ -144,12 +145,18 @@ export default function App() {
       }
     });
 
+    const unsubNotices = onSnapshot(collection(db, 'quick_notices'), (snap) => {
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as QuickNotice));
+      setQuickNotices(data.sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+    });
+
     return () => {
       unsubAuth();
       unsubSettings();
       unsubServices();
       unsubEvents();
       unsubGallery();
+      unsubNotices();
     };
   }, []);
 
@@ -176,6 +183,7 @@ export default function App() {
             services={services} 
             events={events} 
             gallery={gallery}
+            quickNotices={quickNotices}
             onRefresh={() => {}} // Snapshot handles this
           />
         ) : (
@@ -183,7 +191,8 @@ export default function App() {
             {activeTab === 'home' && (
               <Home 
                 services={services} 
-                featuredEvent={featuredEvent} 
+                events={events} 
+                quickNotices={quickNotices}
                 setActiveTab={setActiveTab} 
                 settings={settings}
               />

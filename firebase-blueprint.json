@@ -47,6 +47,22 @@
         "type": { "type": "string", "enum": ["photo", "video"] }
       },
       "required": ["title", "date", "url", "type"]
+    },
+    "QuickNotice": {
+      "title": "Quick Notice",
+      "description": "Last-minute customizable announcement cards with specific sizes/colors",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "bgColor": { "type": "string" },
+        "titleColor": { "type": "string" },
+        "contentColor": { "type": "string" },
+        "width": { "type": "integer" },
+        "minHeight": { "type": "integer" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "content", "bgColor", "titleColor", "contentColor", "width", "minHeight", "createdAt"]
     }
   },
   "firestore": {
@@ -65,6 +81,10 @@
     "/gallery/{itemId}": {
       "schema": "GalleryItem",
       "description": "Media gallery items"
+    },
+    "/quick_notices/{noticeId}": {
+      "schema": "QuickNotice",
+      "description": "Customizable last-minute church announcement cards"
     }
   }
 }
