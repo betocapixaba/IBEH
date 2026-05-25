@@ -125,8 +125,8 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
       {/* Services Grid - Bento Style */}
       <section className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-8 bg-white rounded-[2rem] p-6 md:p-8 shadow-soft border border-slate-100 flex flex-col justify-between">
-            <div className="space-y-6">
+          <div className="lg:col-span-8 bg-white rounded-[2rem] p-5 md:p-6 shadow-soft border border-slate-100 flex flex-col justify-between">
+            <div className="space-y-4">
               <div className="flex flex-col gap-0.5">
                  <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Agenda Semanal</span>
                  <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Nuestros Cultos</h2>
@@ -134,23 +134,23 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {services.length > 0 ? services.map((service) => (
-                  <div key={service.id} className="group p-5 bg-slate-50/50 rounded-[1.25rem] border border-slate-100 hover:border-church-gold hover:bg-white transition-all duration-300">
-                    <div className="w-9 h-9 bg-white rounded-lg shadow-sm flex items-center justify-center mb-3 group-hover:bg-church-gold group-hover:text-white transition-colors duration-300">
+                  <div key={service.id} className="group p-4 bg-slate-50/50 rounded-[1.25rem] border border-slate-100 hover:border-church-gold hover:bg-white transition-all duration-300">
+                    <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center mb-2 group-hover:bg-church-gold group-hover:text-white transition-colors duration-300">
                        <Clock className="w-4 h-4 text-church-gold group-hover:text-white" />
                     </div>
                     <p className="font-sans font-black text-church-navy uppercase tracking-widest text-[9px] mb-0.5">{service.day}</p>
-                    <h4 className="text-lg font-serif font-bold mb-1">{service.time}</h4>
+                    <h4 className="text-base font-serif font-bold mb-0.5">{service.time}</h4>
                     <p className="text-slate-500 text-xs leading-relaxed">{service.description}</p>
                   </div>
                 )) : (
-                  <div className="col-span-2 py-12 text-center">
+                  <div className="col-span-2 py-8 text-center">
                     <p className="text-slate-300 italic font-serif text-lg">Nuestros horarios se están actualizando...</p>
                   </div>
                 )}
               </div>
 
               {/* Facebook Live Callout Infobox */}
-              <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-100/60 flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+              <div className="p-3.5 bg-amber-50/50 rounded-2xl border border-amber-100/60 flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-church-gold font-black uppercase tracking-widest text-[9px]">
                     <span className="relative flex h-2 w-2">
@@ -176,26 +176,26 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
           </div>
 
           <div className="lg:col-span-4">
-            <div className="bg-church-navy text-white rounded-[2rem] p-6 flex flex-col justify-between shadow-strong group overflow-hidden relative h-full min-h-[380px]">
+            <div className="bg-church-navy text-white rounded-[2rem] p-5 flex flex-col justify-between shadow-strong group overflow-hidden relative h-full min-h-[310px]">
               <div className="absolute top-0 right-0 w-32 h-32 bg-church-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-church-gold/20 transition-all" />
-              <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+              <div className="relative z-10 flex flex-col h-full justify-between gap-4">
                 <div>
-                  <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform">
-                    <Sparkles className="w-5 h-5 text-church-gold" />
+                  <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-3 border border-white/10 group-hover:scale-110 transition-transform">
+                    <Sparkles className="w-4 h-4 text-church-gold" />
                   </div>
-                  <h3 className="text-xl font-serif font-black mb-1.5">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
+                  <h3 className="text-lg font-serif font-black mb-1">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
                   <p className="text-slate-200 text-xs leading-relaxed font-medium italic">
                     "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
                   </p>
                 </div>
 
                 {/* Map/Location section inside the rectangle */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <a 
                     href="https://www.google.com/maps/place/449+Washington+St,+Hartford,+CT+06106/@41.7479331,-72.6833788,17z/data=!4m6!3m5!1s0x89e653165a974109:0xb463cf67b1ef8efe!8m2!3d41.7479016!4d-72.6837422!16s%2Fg%2F11yhpl1j4c?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block relative rounded-2xl overflow-hidden border border-white/10 shadow-lg aspect-[1.8/1] w-full group/map hover:scale-[1.02] active:scale-[0.99] transition-transform duration-300"
+                    className="block relative rounded-2xl overflow-hidden border border-white/10 shadow-lg aspect-[2.3/1] w-full group/map hover:scale-[1.02] active:scale-[0.99] transition-transform duration-300"
                     title="Ver en Google Maps"
                   >
                     <img 
@@ -204,7 +204,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                       className="w-full h-full object-cover transition-transform duration-500 group-hover/map:scale-110"
                       referrerPolicy="no-referrer"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex items-end p-2.5">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex items-end p-2">
                       <div className="flex items-center gap-1.5 text-white">
                         <MapPin className="w-3.5 h-3.5 text-church-gold shrink-0 animate-bounce" />
                         <span className="text-[10px] font-bold tracking-wide truncate max-w-[200px]">
@@ -239,11 +239,11 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
              <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Próximas Actividades</span>
              <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Eventos Especiales</h2>
           </div>
-          <div className="space-y-8">
+          <div className="space-y-5">
             {events.map((event) => (
-              <div key={event.id} className="relative rounded-[2rem] overflow-hidden group shadow-soft border border-slate-100">
+              <div key={event.id} className="relative rounded-[1.75rem] overflow-hidden group shadow-soft border border-slate-100">
                 <div className="grid grid-cols-1 lg:grid-cols-2">
-                  <div className="h-[220px] lg:h-auto lg:min-h-[280px] overflow-hidden">
+                  <div className="h-[180px] lg:h-auto lg:min-h-[220px] overflow-hidden">
                     <img 
                       src={event.imageUrl} 
                       alt={event.title}
@@ -251,23 +251,23 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                       referrerPolicy="no-referrer"
                     />
                   </div>
-                  <div className="bg-white p-6 md:p-8 flex flex-col justify-center space-y-4 relative overflow-hidden">
+                  <div className="bg-white p-5 md:p-6 flex flex-col justify-center space-y-3 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-church-gold/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-                    <div className="space-y-2 relative z-10">
-                      <div className="inline-flex items-center gap-2 bg-slate-50 text-church-navy px-3 py-1 rounded-full text-[9px] font-black tracking-widest uppercase border border-slate-100">
-                        <Calendar className="w-3.5 h-3.5 text-church-gold" />
+                    <div className="space-y-1.5 relative z-10">
+                      <div className="inline-flex items-center gap-2 bg-slate-50 text-church-navy px-2.5 py-0.5 rounded-full text-[8px] font-black tracking-widest uppercase border border-slate-100">
+                        <Calendar className="w-3 h-3 text-church-gold" />
                         <span>{event.date} {event.time ? ` | ${event.time}` : ''}</span>
                       </div>
-                      <h3 className="text-2xl md:text-3xl font-serif font-black text-church-navy leading-tight">
+                      <h3 className="text-xl md:text-2xl font-serif font-black text-church-navy leading-tight">
                         {event.title}
                       </h3>
-                      <p className="text-slate-500 text-sm leading-relaxed line-clamp-2">
+                      <p className="text-slate-500 text-xs md:text-sm leading-relaxed line-clamp-2">
                         {event.description}
                       </p>
                     </div>
                     <button 
                       onClick={() => setActiveTab('events')}
-                      className="relative z-10 px-6 py-3 bg-church-navy text-white font-black rounded-full w-fit hover:bg-church-gold transition-all self-start uppercase text-[9px] tracking-widest shadow-xl shadow-church-navy/10"
+                      className="relative z-10 px-5 py-2.5 bg-church-navy text-white font-black rounded-full w-fit hover:bg-church-gold transition-all self-start uppercase text-[8px] tracking-widest shadow-lg shadow-church-navy/5"
                     >
                       Más Información
                     </button>
