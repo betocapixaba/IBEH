@@ -93,7 +93,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
             <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Avisos Especiales</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-            {quickNotices.map((notice) => (
+            {quickNotices.map((notice, index) => (
               <div 
                 key={notice.id} 
                 className={`${notice.widthClass || 'col-span-12'} ${notice.bgColor || 'bg-white'} ${notice.heightClass || 'p-5 min-h-[160px]'} rounded-[2rem] shadow-soft border border-slate-100 flex flex-col justify-between transition-all hover:scale-[1.01] duration-300 relative overflow-hidden`}
@@ -110,9 +110,26 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                   </p>
                 </div>
                 
-                <div className="mt-4 flex items-center justify-between text-[8px] font-mono tracking-wider uppercase opacity-50 relative z-10">
-                  <span className={notice.bgColor?.includes('text-white') || notice.bgColor?.includes('bg-[#1e293b]') || notice.bgColor?.includes('bg-[#1A2B48]') ? 'text-slate-300' : 'text-slate-500'}>Emanuel Hartford</span>
-                  <span className={notice.bgColor?.includes('text-white') || notice.bgColor?.includes('bg-[#1e293b]') || notice.bgColor?.includes('bg-[#1A2B48]') ? 'text-slate-300' : 'text-slate-500'}>
+                <div className="mt-4 flex items-center justify-between text-[8px] font-mono tracking-wider uppercase relative z-10 gap-2">
+                  <span 
+                    style={{
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      borderColor: '#000000',
+                      backgroundColor: '#6b4e4e'
+                    }}
+                    className="px-2.5 py-1 rounded-full border shadow-sm"
+                  >
+                    Aviso {index + 1}
+                  </span>
+                  <span 
+                    style={{
+                      color: '#ffffff',
+                      borderColor: '#000000',
+                      backgroundColor: '#664141'
+                    }}
+                    className="px-2.5 py-1 rounded-full border shadow-sm"
+                  >
                     {new Date(notice.createdAt || Date.now()).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>
