@@ -16,12 +16,11 @@ export default function Footer({ settings, services }: FooterProps) {
           {/* Brand */}
           <div className="lg:col-span-5 space-y-4">
             <div className="space-y-2">
-              <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Emanuel Hartford</span>
-              <h3 className="font-serif text-3xl font-black tracking-tight leading-tight max-w-sm">
+              <h3 className="font-serif text-3xl font-black tracking-tight leading-tight max-w-sm text-church-gold">
                 {settings.name || "Iglesia Bautista Emanuel"}
               </h3>
             </div>
-            <p className="text-slate-400 text-base leading-relaxed max-w-md font-medium">
+            <p className="text-slate-100 text-base leading-relaxed max-w-md font-medium font-sans">
               Unidos en fe, esperanza y caridad. Una comunidad dedicada a la transformación de vidas a través de la Palabra de Dios.
             </p>
             <div className="flex space-x-4 pt-1">
@@ -49,7 +48,7 @@ export default function Footer({ settings, services }: FooterProps) {
                   <MapPin className="w-4 h-4 text-church-gold" />
                 </div>
                 <div>
-                  <p className="text-slate-400 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-50">DIRECCIÓN</p>
+                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">DIRECCIÓN</p>
                   <p className="text-white text-sm leading-relaxed font-medium whitespace-pre-line">{settings.address || '449 Park Street, Hartford - CT 06106'}</p>
                 </div>
               </div>
@@ -58,7 +57,7 @@ export default function Footer({ settings, services }: FooterProps) {
                   <Phone className="w-4 h-4 text-church-gold" />
                 </div>
                 <div>
-                  <p className="text-slate-400 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-50">TELÉFONO</p>
+                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">TELÉFONO</p>
                   <p className="text-white text-sm leading-relaxed font-medium">{settings.phone || '(860) 555-0123'}</p>
                 </div>
               </div>
@@ -75,7 +74,7 @@ export default function Footer({ settings, services }: FooterProps) {
                     <div className="w-1.5 h-1.5 rounded-full bg-church-gold" />
                     <div className="flex flex-col">
                       <span className="text-white font-serif font-bold text-base leading-tight">{service.day}</span>
-                      <span className="text-slate-400 text-xs font-medium">{service.time}</span>
+                      <span className="text-slate-200 text-xs font-medium">{service.time}</span>
                     </div>
                   </div>
                 ))
@@ -88,9 +87,9 @@ export default function Footer({ settings, services }: FooterProps) {
           </div>
         </div>
         
-        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-slate-500 font-black uppercase tracking-[0.3em]">
-          <span>© {new Date().getFullYear()} {settings.name || "Iglesia Bautista Emanuel"}</span>
-          <span className="text-slate-700">Enviados por Dios — Hartford, CT</span>
+        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-slate-200 font-black uppercase tracking-[0.3em]">
+          <span className="opacity-80">© {new Date().getFullYear()} {settings.name || "Iglesia Bautista Emanuel"}</span>
+          <span className="text-church-gold/80">Enviados por Dios — Hartford, CT</span>
         </div>
       </div>
     </footer>
