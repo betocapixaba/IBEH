@@ -27,7 +27,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
           <div className="absolute inset-0 bg-gradient-to-b from-church-navy/20 via-transparent to-slate-50" />
         </div>
         
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center space-y-8">
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center space-y-8 translate-y-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -69,11 +69,17 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
               Ver Calendario
             </button>
           </motion.div>
-        </div>
 
-        {/* Floating Stat/Quick Link */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-12 text-black font-sans text-[10px] uppercase tracking-[0.3em] font-black">
-           <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-church-gold" /> Culto Dominical 10:00 AM</div>
+          {/* Floating Stat/Quick Link - Redesigned & Moved below buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            style={{ color: '#2e416c' }}
+            className="flex items-center justify-center gap-3 font-sans text-[10px] uppercase tracking-[0.3em] font-black bg-white/5 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 w-fit mx-auto hover:bg-white/10 hover:border-white/20 transition-all duration-300 shadow-lg cursor-default"
+          >
+            <Clock className="w-4 h-4 text-church-gold" /> Culto Dominical 10:00 AM
+          </motion.div>
         </div>
       </section>
 
@@ -157,9 +163,14 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                     Acompañe nuestro servicio dominical en Facebook Live. Comienza a las 11:15 de la mañana.
                   </p>
                 </div>
-                <div className="px-4 py-2 bg-church-navy text-white text-[10px] uppercase tracking-widest font-black rounded-xl whitespace-nowrap self-start md:self-auto text-center shadow-sm">
+                <a 
+                  href="https://www.facebook.com/IBEHARTFORD"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-church-navy hover:bg-church-navy/90 text-white text-[10px] uppercase tracking-widest font-black rounded-xl whitespace-nowrap self-start md:self-auto text-center shadow-sm transition-all duration-300 hover:scale-105 active:scale-98 cursor-pointer"
+                >
                   ¡Usted es nuestro invitado!
-                </div>
+                </a>
               </div>
             </div>
           </div>

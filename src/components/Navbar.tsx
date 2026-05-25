@@ -62,10 +62,19 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onAdminToggle
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
+                    style={{
+                      color: activeTab === item.id 
+                        ? 'white' 
+                        : item.id === 'history' 
+                          ? '#124990' 
+                          : '#4a4a92'
+                    }}
                     className={`px-5 py-2.5 text-xs font-black uppercase tracking-widest rounded-full transition-all duration-500 ${
                       activeTab === item.id 
                         ? 'bg-church-navy text-white shadow-strong' 
-                        : 'text-slate-400 hover:text-church-navy hover:bg-slate-50'
+                        : item.id === 'history'
+                          ? 'hover:bg-slate-100 font-extrabold'
+                          : 'hover:bg-slate-50'
                     }`}
                   >
                     {item.name}
@@ -77,10 +86,11 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onAdminToggle
 
               <button
                 onClick={onAdminToggle}
+                style={{ color: isAdmin ? 'white' : '#f09a9a' }}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-500 text-[10px] font-black uppercase tracking-widest ${
                   isAdmin 
-                    ? 'bg-church-gold text-white border-church-gold shadow-soft' 
-                    : 'text-slate-300 border-slate-50 hover:border-church-gold hover:text-church-gold bg-slate-50/50'
+                    ? 'bg-church-gold border-church-gold shadow-soft' 
+                    : 'border-slate-50 hover:border-church-gold hover:text-church-gold bg-slate-50/50'
                 }`}
                 title="Panel de Administración"
               >
@@ -116,8 +126,19 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onAdminToggle
                 setActiveTab(item.id);
                 setIsOpen(false);
               }}
+              style={
+                activeTab === item.id 
+                  ? undefined 
+                  : item.id === 'history' 
+                    ? { color: '#124990' } 
+                    : { color: '#4a4a92' }
+              }
               className={`block w-full text-left px-6 py-4 rounded-2xl text-base font-bold transition-all ${
-                activeTab === item.id ? 'bg-church-navy text-white' : 'text-slate-600 bg-slate-50'
+                activeTab === item.id 
+                  ? 'bg-church-navy text-white' 
+                  : item.id === 'history'
+                    ? 'bg-slate-50 font-extrabold'
+                    : 'bg-slate-50'
               }`}
             >
               {item.name}
@@ -128,7 +149,8 @@ export default function Navbar({ activeTab, setActiveTab, isAdmin, onAdminToggle
               onAdminToggle();
               setIsOpen(false);
             }}
-            className="w-full text-center py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-church-gold border-t border-slate-100 mt-4"
+            style={!isAdmin ? { color: '#f09a9a' } : undefined}
+            className="w-full text-center py-4 text-xs font-black uppercase tracking-widest hover:text-church-gold border-t border-slate-100 mt-4"
           >
             {isAdmin ? 'Salir Administrador' : 'Panel Administrador'}
           </button>
