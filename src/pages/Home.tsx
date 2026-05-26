@@ -15,7 +15,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
   return (
     <div className="space-y-12 pb-8">
       {/* Hero Section - Refined */}
-      <section className="relative min-h-[65vh] flex items-center justify-center pt-16 py-12">
+      <section className="relative min-h-[65vh] flex items-center justify-center pt-24 sm:pt-32 py-12">
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img 
             src={settings.heroUrl || "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80&w=2000"} 
@@ -27,7 +27,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
           <div className="absolute inset-0 bg-gradient-to-b from-church-navy/20 via-transparent to-slate-50" />
         </div>
         
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center space-y-8 translate-y-6">
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center space-y-8 translate-y-10">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
