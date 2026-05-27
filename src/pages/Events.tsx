@@ -1,21 +1,27 @@
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { Event } from '../types';
+import { LanguageCode, translateText } from '../lib/translations';
 
 interface EventsProps {
   events: Event[];
+  currentLang?: LanguageCode;
 }
 
-export default function Events({ events }: EventsProps) {
+export default function Events({ events, currentLang = 'es' }: EventsProps) {
   return (
     <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
       <div className="text-center mb-12 space-y-4 max-w-3xl mx-auto">
         <div className="flex flex-col items-center gap-2">
-           <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Calendario de Actividades</span>
-           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Próximos Eventos</h1>
+           <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">
+             {translateText('Calendario de Actividades', currentLang)}
+           </span>
+           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">
+             {translateText('Próximos Eventos', currentLang)}
+           </h1>
         </div>
         <p className="text-slate-500 text-lg leading-relaxed font-medium">
-          Mantente al tanto de todas nuestras actividades especiales, conferencias y reuniones grupales.
+          {translateText('Mantente al tanto de todas nuestras actividades especiales, conferencias y reuniones grupales.', currentLang)}
         </p>
       </div>
 
@@ -32,14 +38,15 @@ export default function Events({ events }: EventsProps) {
             <div className="relative h-72 overflow-hidden">
                <img 
                  src={event.imageUrl} 
-                 alt={event.title}
+                 alt={translateText(event.title, currentLang || 'es')}
                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                 referrerPolicy="no-referrer"
                />
                <div className="absolute inset-0 bg-gradient-to-t from-church-navy/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                
                <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-5 py-3 rounded-2xl flex flex-col items-center border border-white shadow-soft">
                   <span className="text-[10px] uppercase font-black text-church-gold tracking-widest leading-none mb-1">
-                    {event.date ? new Date(event.date + 'T12:00:00').toLocaleDateString('es-ES', { month: 'short' }).replace('.', '') : 'PROX'}
+                    {event.date ? translateText(new Date(event.date + 'T12:00:00').toLocaleDateString('es-ES', { month: 'short' }), currentLang).replace('.', '').toUpperCase() : 'PROX'}
                   </span>
                   <span className="text-2xl font-serif font-black text-church-navy leading-none">
                     {event.date ? new Date(event.date + 'T12:00:00').getDate() : '24'}
@@ -49,15 +56,17 @@ export default function Events({ events }: EventsProps) {
             
             <div className="p-8 flex-grow flex flex-col space-y-4">
               <div className="space-y-3">
-                <h3 className="text-2xl font-serif font-bold text-church-navy leading-tight group-hover:text-church-gold transition-colors">{event.title}</h3>
+                <h3 className="text-2xl font-serif font-bold text-church-navy leading-tight group-hover:text-church-gold transition-colors">
+                  {translateText(event.title, currentLang)}
+                </h3>
                 <p className="text-slate-500 text-sm leading-relaxed font-medium line-clamp-3">
-                  {event.description}
+                  {translateText(event.description, currentLang)}
                 </p>
                 {event.longDescription && (
                   <div className="mt-4 p-5 bg-church-gold/5 rounded-2xl border border-church-gold/10 relative overflow-hidden group/info">
                     <div className="absolute top-0 right-0 w-16 h-16 bg-church-gold/10 rounded-full blur-2xl -mr-8 -mt-8 transition-colors group-hover/info:bg-church-gold/20" />
                     <p className="text-church-navy text-xs leading-relaxed font-semibold relative z-10 whitespace-pre-wrap">
-                      {event.longDescription}
+                      {translateText(event.longDescription, currentLang)}
                     </p>
                   </div>
                 )}
@@ -68,7 +77,7 @@ export default function Events({ events }: EventsProps) {
                   <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
                     <Calendar className="w-3.5 h-3.5 text-church-gold" />
                   </div>
-                  <span>{event.date}</span>
+                  <span>{translateText(event.date, currentLang)}</span>
                 </div>
                 <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 tracking-wide">
                   <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
@@ -80,14 +89,16 @@ export default function Events({ events }: EventsProps) {
                   <div className="w-7 h-7 rounded-xl bg-slate-50 flex items-center justify-center">
                     <MapPin className="w-3.5 h-3.5 text-church-gold" />
                   </div>
-                  <span>{event.location || 'Santuario Principal'}</span>
+                  <span>{translateText(event.location || 'Santuario Principal', currentLang)}</span>
                 </div>
               </div>
             </div>
           </motion.div>
         )) : (
           <div className="col-span-full py-32 text-center bg-white rounded-[3rem] border border-slate-50 shadow-soft">
-            <p className="text-slate-300 italic font-serif text-2xl">No hay eventos programados en este momento...</p>
+            <p className="text-slate-300 italic font-serif text-2xl">
+              {translateText('No hay eventos programados en este momento...', currentLang)}
+            </p>
           </div>
         )}
       </div>

@@ -1,11 +1,13 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../lib/firebase';
 import { 
   collection, 
   deleteDoc, 
   doc, 
   setDoc,
-  onSnapshot
+  onSnapshot,
+  updateDoc
 } from 'firebase/firestore';
 import { ChurchSettings, Service, Event, GalleryItem, AdminAccount, HistoryStep, QuickNotice } from '../types';
 import { 
@@ -33,7 +35,10 @@ import {
   X,
   History,
   Bell,
-  HeartHandshake
+  HeartHandshake,
+  Send,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -44,6 +49,17 @@ interface AdminDashboardProps {
   quickNotices: QuickNotice[];
   onRefresh: () => void;
 }
+
+const formatUSPhone = (value: string) => {
+  const cleaned = value.replace(/\D/g, '');
+  if (cleaned.length === 0) return '';
+  const match = cleaned.slice(0, 10).match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+  if (!match) return cleaned;
+  const [, p1, p2, p3] = match;
+  if (cleaned.length <= 3) return p1;
+  if (cleaned.length <= 6) return `(${p1}) ${p2}`;
+  return `(${p1}) ${p2}-${p3}`;
+};
 
 const LOGO_PRESETS = [
   { name: "Cruz Dorada", url: "https://images.unsplash.com/photo-1545641203-7d072a14e3b2?auto=format&fit=crop&q=80&w=120" },
@@ -78,6 +94,19 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
 
   // Prayer Requests State
   const [prayerRequests, setPrayerRequests] = useState<any[]>([]);
+  const [toast, setToast] = useState<{ title: string; message: string } | null>(null);
+  const [editingPrayerId, setEditingPrayerId] = useState<string | null>(null);
+  const [editingPrayerName, setEditingPrayerName] = useState('');
+  const [editingPrayerEmail, setEditingPrayerEmail] = useState('');
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // User management form state
   const [newUserId, setNewUserId] = useState('');
@@ -1418,7 +1447,8 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                       <input 
                         type="text" 
                         value={tempSettings.phone}
-                        onChange={(e) => setTempSettings({ ...tempSettings, phone: e.target.value })}
+                        onChange={(e) => setTempSettings({ ...tempSettings, phone: formatUSPhone(e.target.value) })}
+                        placeholder="(000) 000-0000"
                         className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-850 font-medium"
                       />
                     </div>
@@ -2686,25 +2716,117 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
               <div className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-slate-50 shadow-soft space-y-6">
                 {prayerRequests.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {prayerRequests.map((req) => (
+                    {prayerRequests.map((req, index) => (
                       <div 
                         key={req.id} 
                         className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100 shadow-sm hover:shadow-soft hover:bg-white transition-all duration-300 relative group flex flex-col justify-between"
                       >
                         <div className="space-y-4">
                           <div className="flex justify-between items-start gap-3">
-                            <div>
-                              <h4 className="font-serif font-black text-lg text-church-navy leading-tight">{req.name}</h4>
-                              {req.phone ? (
-                                <a 
-                                  href={`tel:${req.phone}`} 
-                                  className="text-[10px] font-bold text-church-gold hover:underline flex items-center gap-1.5 mt-1"
-                                >
-                                  <Clock className="w-3.5 h-3.5" />
-                                  <span>{req.phone}</span>
-                                </a>
+                            <div className="flex-grow">
+                              {editingPrayerId === req.id ? (
+                                <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                                  <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Nombre del Solicitante</label>
+                                    <input
+                                      type="text"
+                                      value={editingPrayerName}
+                                      onChange={(e) => setEditingPrayerName(e.target.value)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-church-navy font-bold focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold transition-all"
+                                      placeholder="Nombre"
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Correo Electrónico (Para agradecimiento)</label>
+                                    <input
+                                      type="email"
+                                      value={editingPrayerEmail}
+                                      onChange={(e) => setEditingPrayerEmail(e.target.value)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs text-church-navy font-medium focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold transition-all"
+                                      placeholder="correo@ejemplo.com"
+                                    />
+                                  </div>
+                                  <div className="flex gap-2 pt-1 border-t border-slate-100">
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        try {
+                                          await updateDoc(doc(db, 'prayer_requests', req.id), {
+                                            name: editingPrayerName.trim(),
+                                            email: editingPrayerEmail.trim()
+                                          });
+                                          setEditingPrayerId(null);
+                                          setToast({
+                                            title: 'Datos Guardados',
+                                            message: 'El nombre y correo han sido actualizados exitosamente.'
+                                          });
+                                        } catch (e) {
+                                          console.error(e);
+                                          alert('Error al actualizar.');
+                                        }
+                                      }}
+                                      className="px-3 py-1.5 bg-church-navy text-white text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-church-gold transition-all cursor-pointer flex items-center gap-1.5"
+                                    >
+                                      <CheckCircle className="w-3.5 h-3.5 text-church-gold" />
+                                      <span>Salvar</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setEditingPrayerId(null)}
+                                      className="px-3 py-1.5 bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-slate-200 transition-all cursor-pointer"
+                                    >
+                                      <span>Cancelar</span>
+                                    </button>
+                                  </div>
+                                </div>
                               ) : (
-                                <span className="text-[10px] text-slate-400 italic block mt-1">Sin teléfono</span>
+                                <>
+                                  <div className="flex justify-between items-start gap-2">
+                                    <h4 className="font-serif font-black text-lg text-church-navy leading-tight">{req.name}</h4>
+                                    <button
+                                      onClick={() => {
+                                        setEditingPrayerId(req.id);
+                                        setEditingPrayerName(req.name || '');
+                                        setEditingPrayerEmail(req.email || '');
+                                      }}
+                                      className="p-1.5 rounded-xl hover:bg-white text-slate-400 hover:text-church-gold border border-transparent hover:border-slate-100 transition-all cursor-pointer shrink-0"
+                                      title="Editar Nombre / Correo"
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                  <div className="flex flex-col gap-1 mt-1.5">
+                                    {req.phone ? (
+                                      <a 
+                                        href={`tel:${req.phone}`} 
+                                        className="text-[10px] font-bold text-slate-500 hover:text-church-gold hover:underline flex items-center gap-1.5"
+                                      >
+                                        <Phone className="w-3.5 h-3.5 text-church-gold shrink-0" />
+                                        <span>{req.phone}</span>
+                                      </a>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-400 italic flex items-center gap-1.5">
+                                        <Phone className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                                        <span>Sin teléfono</span>
+                                      </span>
+                                    )}
+
+                                    {req.email ? (
+                                      <a 
+                                        href={`mailto:${req.email}`} 
+                                        className="text-[10px] font-bold text-slate-500 hover:text-church-gold hover:underline flex items-center gap-1.5"
+                                      >
+                                        <Mail className="w-3.5 h-3.5 text-church-gold shrink-0" />
+                                        <span className="truncate max-w-[150px] md:max-w-[200px]">{req.email}</span>
+                                      </a>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-400 italic flex items-center gap-1.5">
+                                        <Mail className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                                        <span>Sin email</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </>
                               )}
                             </div>
                             <span className="text-[9px] font-mono text-slate-400 font-bold bg-white border border-slate-100 px-2.5 py-1 rounded-full uppercase shrink-0">
@@ -2716,13 +2838,29 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                           </div>
 
                           <div className="border-t border-slate-100 pt-3">
-                            <p className="text-xs text-slate-600 leading-relaxed italic font-serif">
+                            <p className={`text-xs leading-relaxed italic font-serif ${index === 0 ? 'text-black font-semibold' : 'text-slate-600'}`}>
                               "{req.request}"
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex justify-end pt-4 border-t border-slate-100/50 mt-4">
+                        <div className="flex justify-between items-center pt-4 border-t border-slate-100/50 mt-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setToast({
+                                title: 'Agradecimiento Enviado',
+                                message: req.email 
+                                  ? `Simulando correo enviado a "${req.email}" confirmando la recepción de su petición de oración.`
+                                  : `Simulando correo enviado a "${req.name}" confirmando la recepción de su petición de oración.`
+                              });
+                            }}
+                            className="text-xs font-black text-church-gold hover:text-church-gold/80 hover:bg-amber-50/50 uppercase tracking-widest flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                            <span>Agradecer</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => {
@@ -2795,6 +2933,33 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed bottom-6 right-6 z-[110] max-w-sm w-full bg-church-navy text-white p-5 rounded-3xl border border-white/10 shadow-strong flex items-start gap-4"
+          >
+            <div className="w-10 h-10 rounded-xl bg-church-gold/20 flex items-center justify-center text-church-gold shrink-0 border border-church-gold/10">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div className="flex-grow space-y-1">
+              <h4 className="font-serif font-black text-sm text-church-gold">{toast.title}</h4>
+              <p className="text-slate-200 text-xs font-medium leading-relaxed">{toast.message}</p>
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="p-1 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* History Step Modal */}
       {isHistoryFormOpen && (

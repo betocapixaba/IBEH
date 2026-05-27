@@ -20,11 +20,13 @@ import Events from './pages/Events';
 import Gallery from './pages/Gallery';
 import AdminDashboard from './pages/AdminDashboard';
 import { onAuthStateChanged } from 'firebase/auth';
+import { LanguageCode } from './lib/translations';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [currentLang, setCurrentLang] = useState<LanguageCode>('es');
 
   const [settings, setSettings] = useState<ChurchSettings>({
     name: "Iglesia Bautista Emanuel Hartford",
@@ -174,6 +176,8 @@ export default function App() {
         isAdmin={isAdminMode} 
         onAdminToggle={handleAdminToggle}
         settings={settings}
+        currentLang={currentLang}
+        setCurrentLang={setCurrentLang}
       />
 
       <main className="flex-grow">
@@ -195,20 +199,21 @@ export default function App() {
                 quickNotices={quickNotices}
                 setActiveTab={setActiveTab} 
                 settings={settings}
+                currentLang={currentLang}
               />
             )}
             {(activeTab === 'history' || activeTab === 'about') && (
-              <About activeSection={activeTab as any} settings={settings} />
+              <About activeSection={activeTab as any} settings={settings} currentLang={currentLang} />
             )}
-            {activeTab === 'ministries' && <Ministries />}
-            {activeTab === 'pastor' && <Pastor settings={settings} />}
-            {activeTab === 'events' && <Events events={events} />}
-            {activeTab === 'gallery' && <Gallery items={gallery} />}
+            {activeTab === 'ministries' && <Ministries currentLang={currentLang} />}
+            {activeTab === 'pastor' && <Pastor settings={settings} currentLang={currentLang} />}
+            {activeTab === 'events' && <Events events={events} currentLang={currentLang} />}
+            {activeTab === 'gallery' && <Gallery items={gallery} currentLang={currentLang} />}
           </>
         )}
       </main>
 
-      <Footer settings={settings} services={services} />
+      <Footer settings={settings} services={services} currentLang={currentLang} />
     </div>
   );
 }

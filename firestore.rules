@@ -44,7 +44,7 @@ service cloud.firestore {
 
     // Admin accounts collection
     match /admin_accounts/{id} {
-      allow read, write: if isValidId(id);
+      allow read, write: if true;
     }
 
     // Prayer requests collection

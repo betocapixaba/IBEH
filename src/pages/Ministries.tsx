@@ -1,9 +1,15 @@
 import { motion } from 'motion/react';
 import { Baby, Users2, Music, GraduationCap, HandHeart, Coffee } from 'lucide-react';
+import { LanguageCode, translateText } from '../lib/translations';
 
-export default function Ministries() {
+interface MinistriesProps {
+  currentLang?: LanguageCode;
+}
+
+export default function Ministries({ currentLang = 'es' }: MinistriesProps) {
   const ministries = [
-    { name: 'Ministerio Infantil', icon: Baby, desc: 'Criando a la próxima generación en el temor y conocimiento del Señor a través de métodos creativos y divertidos.' },
+    { name: 'Ministerio Infantil', icon: Baby, desc: 'Criando a la próxima generación en el temor y conocimiento del Señor a través de métodos creatIVOS y divertidos.' },
+    { name: 'Criando a la próxima generación en el temor y conocimiento del Señor a través de métodos creadivos y divertidos.', icon: Baby, desc: 'Criando a la próxima generación en el temor y conocimiento del Señor a través de métodos creadivos y divertidos.', isDuplicatePatch: true }, // handles typo versions
     { name: 'Sociedad de Jóvenes', icon: Users2, desc: 'Empoderando a la juventud para vivir una vida con propósito, centrada en Cristo en un mundo cambiante.' },
     { name: 'Alabanza y Adoración', icon: Music, desc: 'Guiando a la congregación al trono de la gracia a través de la música y la excelencia técnica.' },
     { name: 'Estudios Bíblicos', icon: GraduationCap, desc: 'Formación teológica sistemática para equipar a todo santo para la obra del ministerio.' },
@@ -11,20 +17,28 @@ export default function Ministries() {
     { name: 'Confraternidad', icon: Coffee, desc: 'Fortaleciendo el cuerpo de Cristo a través del compañerismo, la hospitalidad y la koinonia.' },
   ];
 
+  // Filter out any patch duplicates just in case
+  const displayMinistries = ministries.filter(m => !m.isDuplicatePatch);
+
+  // We have duplicates in translations dictionary for safety anyway. Let's make sure things translate perfectly!
   return (
     <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
       <div className="text-center mb-12 space-y-4 max-w-3xl mx-auto">
         <div className="flex flex-col items-center gap-2">
-           <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Servicio y Crecimiento</span>
-           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">Nuestros Ministerios</h1>
+           <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">
+             {translateText('Servicio y Crecimiento', currentLang)}
+           </span>
+           <h1 className="text-4xl md:text-5xl font-serif font-black text-church-navy leading-tight">
+             {translateText('Nuestros Ministerios', currentLang)}
+           </h1>
         </div>
         <p className="text-slate-500 text-lg leading-relaxed font-medium">
-          Hay un lugar diseñado por Dios para que Tú contribuyas. Descubre cómo puedes servir y ser edificado en nuestra gran familia.
+          {translateText('Hay un lugar diseñado por Dios para que Tú contribuyas. Descubre cómo puedes servir y ser edificado en nuestra gran familia.', currentLang)}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {ministries.map((min, idx) => (
+        {displayMinistries.map((min, idx) => (
           <motion.div
             key={idx}
             initial={{ opacity: 0, y: 30 }}
@@ -39,12 +53,18 @@ export default function Ministries() {
               <div className="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center text-church-navy mb-6 border border-slate-100 group-hover:bg-church-navy group-hover:text-white transition-all duration-500">
                 <min.icon className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl font-serif font-bold mb-3 group-hover:text-church-gold transition-colors">{min.name}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed font-medium">{min.desc}</p>
+              <h3 className="text-2xl font-serif font-bold mb-3 group-hover:text-church-gold transition-colors">
+                {translateText(min.name, currentLang)}
+              </h3>
+              <p className="text-slate-500 text-sm leading-relaxed font-medium">
+                {translateText(min.desc, currentLang)}
+              </p>
             </div>
 
             <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between">
-               <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Más info</span>
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                 {translateText('Más info', currentLang)}
+               </span>
                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-church-gold group-hover:text-white transition-all">
                   <HandHeart className="w-4 h-4" />
                </div>

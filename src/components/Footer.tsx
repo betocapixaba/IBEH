@@ -1,12 +1,16 @@
-import { MapPin, Phone, Mail, Facebook } from 'lucide-react';
+import { MapPin, Phone, Facebook } from 'lucide-react';
 import { ChurchSettings, Service } from '../types';
+import { LanguageCode, translateText, TRANSLATIONS } from '../lib/translations';
 
 interface FooterProps {
   settings: ChurchSettings;
   services: Service[];
+  currentLang?: LanguageCode;
 }
 
-export default function Footer({ settings, services }: FooterProps) {
+export default function Footer({ settings, services, currentLang = 'es' }: FooterProps) {
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.es;
+
   return (
     <footer className="bg-church-navy text-white pt-10 pb-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-church-gold/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
@@ -17,11 +21,11 @@ export default function Footer({ settings, services }: FooterProps) {
           <div className="lg:col-span-5 space-y-4">
             <div className="space-y-2">
               <h3 className="font-serif text-3xl font-black tracking-tight leading-tight max-w-sm text-church-gold">
-                {settings.name || "Iglesia Bautista Emanuel"}
+                {translateText(settings.name || "Iglesia Bautista Emanuel", currentLang)}
               </h3>
             </div>
             <p className="text-slate-100 text-base leading-relaxed max-w-md font-medium font-sans">
-              Unidos en fe, esperanza y caridad. Una comunidad dedicada a la transformación de vidas a través de la Palabra de Dios.
+              {translateText('Unidos en fe, esperanza y caridad. Una comunidad dedicada a la transformación de vidas a través de la Palabra de Dios.', currentLang)}
             </p>
             <div className="flex space-x-4 pt-1">
               <a 
@@ -41,15 +45,21 @@ export default function Footer({ settings, services }: FooterProps) {
 
           {/* Contact */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-black text-[10px] uppercase tracking-[0.4em] text-church-gold">Ubicación y Contacto</h4>
+            <h4 className="font-black text-[10px] uppercase tracking-[0.4em] text-church-gold">
+              {t.locationContact}
+            </h4>
             <div className="space-y-4">
               <div className="flex items-start gap-4 group">
                 <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
                   <MapPin className="w-4 h-4 text-church-gold" />
                 </div>
                 <div>
-                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">DIRECCIÓN</p>
-                  <p className="text-white text-sm leading-relaxed font-medium whitespace-pre-line">{settings.address || '449 Park Street, Hartford - CT 06106'}</p>
+                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">
+                    {t.address}
+                  </p>
+                  <p className="text-white text-sm leading-relaxed font-medium whitespace-pre-line">
+                    {translateText(settings.address || '449 Park Street, Hartford - CT 06106', currentLang)}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-4 group">
@@ -57,8 +67,12 @@ export default function Footer({ settings, services }: FooterProps) {
                   <Phone className="w-4 h-4 text-church-gold" />
                 </div>
                 <div>
-                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">TELÉFONO</p>
-                  <p className="text-white text-sm leading-relaxed font-medium">{settings.phone || '(860) 555-0123'}</p>
+                  <p className="text-slate-200 text-[9px] font-black uppercase tracking-wider mb-0.5 opacity-70">
+                    {t.phoneLabel}
+                  </p>
+                  <p className="text-white text-sm leading-relaxed font-medium">
+                    {settings.phone || '(860) 555-0123'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -66,21 +80,29 @@ export default function Footer({ settings, services }: FooterProps) {
 
           {/* Quick Links */}
           <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-black text-[10px] uppercase tracking-[0.4em] text-church-gold">Horarios de Reunión</h4>
+            <h4 className="font-black text-[10px] uppercase tracking-[0.4em] text-church-gold">
+              {t.meetingTimes}
+            </h4>
             <div className="space-y-4">
               {services && services.length > 0 ? (
                 services.map((service) => (
                   <div key={service.id} className="flex items-center gap-4">
                     <div className="w-1.5 h-1.5 rounded-full bg-church-gold" />
                     <div className="flex flex-col">
-                      <span className="text-white font-serif font-bold text-base leading-tight">{service.day}</span>
-                      <span className="text-slate-200 text-xs font-medium">{service.time}</span>
+                      <span className="text-white font-serif font-bold text-base leading-tight">
+                        {translateText(service.day, currentLang)}
+                      </span>
+                      <span className="text-slate-200 text-xs font-medium">
+                        {service.time}
+                      </span>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="flex flex-col gap-4">
-                   <p className="text-slate-500 italic text-xs">Consulte el calendario actualizado.</p>
+                   <p className="text-slate-500 italic text-xs">
+                     {translateText('Consulte el calendario actualizado.', currentLang)}
+                   </p>
                 </div>
               )}
             </div>
@@ -88,8 +110,10 @@ export default function Footer({ settings, services }: FooterProps) {
         </div>
         
         <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] text-slate-200 font-black uppercase tracking-[0.3em]">
-          <span className="opacity-80">© {new Date().getFullYear()} {settings.name || "Iglesia Bautista Emanuel"}</span>
-          <span className="text-church-gold/80">Enviados por Dios — Hartford, CT</span>
+          <span className="opacity-80">© {new Date().getFullYear()} {translateText(settings.name || "Iglesia Bautista Emanuel", currentLang)}</span>
+          <span className="text-church-gold/80">
+            {translateText('Enviados por Dios — Hartford, CT', currentLang)}
+          </span>
         </div>
       </div>
     </footer>

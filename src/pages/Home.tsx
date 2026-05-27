@@ -5,6 +5,18 @@ import { Service, Event, ChurchSettings, QuickNotice } from '../types';
 import churchMapImg from '../assets/images/church_map_1779745801080.png';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { TRANSLATIONS, LanguageCode, translateText } from '../lib/translations';
+
+const formatUSPhone = (value: string) => {
+  const cleaned = value.replace(/\D/g, '');
+  if (cleaned.length === 0) return '';
+  const match = cleaned.slice(0, 10).match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+  if (!match) return cleaned;
+  const [, p1, p2, p3] = match;
+  if (cleaned.length <= 3) return p1;
+  if (cleaned.length <= 6) return `(${p1}) ${p2}`;
+  return `(${p1}) ${p2}-${p3}`;
+};
 
 interface HomeProps {
   services: Service[];
@@ -12,20 +24,31 @@ interface HomeProps {
   quickNotices: QuickNotice[];
   setActiveTab: (tab: string) => void;
   settings: ChurchSettings;
+  currentLang?: LanguageCode;
 }
 
-export default function Home({ services, events, quickNotices, setActiveTab, settings }: HomeProps) {
+export default function Home({ 
+  services, 
+  events, 
+  quickNotices, 
+  setActiveTab, 
+  settings,
+  currentLang = 'es'
+}: HomeProps) {
   const [prayerName, setPrayerName] = useState('');
   const [prayerPhone, setPrayerPhone] = useState('');
+  const [prayerEmail, setPrayerEmail] = useState('');
   const [prayerRequest, setPrayerRequest] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
+  const t = TRANSLATIONS[currentLang];
+
   const handlePrayerSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!prayerName.trim() || !prayerRequest.trim()) {
-      setSubmitError('Por favor, rellene todos los campos obligatorios (*).');
+      setSubmitError(t.error);
       return;
     }
 
@@ -37,6 +60,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
       await addDoc(collection(db, 'prayer_requests'), {
         name: prayerName.trim(),
         phone: prayerPhone.trim(),
+        email: prayerEmail.trim(),
         request: prayerRequest.trim(),
         createdAt: new Date().toISOString()
       });
@@ -44,10 +68,11 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
       setSubmitSuccess(true);
       setPrayerName('');
       setPrayerPhone('');
+      setPrayerEmail('');
       setPrayerRequest('');
     } catch (error) {
       console.error('Error submitting prayer request:', error);
-      setSubmitError('Hubo un error al enviar su pedido. Inténtelo de nuevo.');
+      setSubmitError(t.serverError);
       try {
         handleFirestoreError(error, OperationType.CREATE, 'prayer_requests');
       } catch (formattedError) {
@@ -83,16 +108,16 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
             <div className="flex items-center justify-center gap-4 mb-2">
                <div className="h-px w-8 bg-church-gold" />
                <span className="font-sans text-church-gold font-black tracking-[0.4em] uppercase text-[10px] sm:text-xs">
-                 {settings.heroBadge || 'Nuestra Casa es Tu Casa'}
+                 {translateText(settings.heroBadge || 'Nuestra Casa es Tu Casa', currentLang)}
                </span>
                <div className="h-px w-8 bg-church-gold" />
             </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif font-black text-white leading-[1.1] tracking-tight">
-              {settings.heroTitle || 'Donde la fe encuentra'} <br className="hidden md:block" />
-              <span className="italic font-normal text-church-gold/90">{settings.heroTitleHighlight || 'una familia.'}</span>
+              {translateText(settings.heroTitle || 'Donde la fe encuentra', currentLang)} <br className="hidden md:block" />
+              <span className="italic font-normal text-church-gold/90">{translateText(settings.heroTitleHighlight || 'una familia.', currentLang)}</span>
             </h1>
             <p className="text-slate-200 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed opacity-90">
-              {settings.heroSubtitle || 'Ubicados en el corazón de Hartford, somos una comunidad dedicada a exaltar a Cristo y servir a nuestro prójimo con amor.'}
+              {translateText(settings.heroSubtitle || 'Ubicados en el corazón de Hartford, somos una comunidad dedicada a exaltar a Cristo y servir a nuestro prójimo con amor.', currentLang)}
             </p>
           </motion.div>
           
@@ -106,13 +131,13 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
               onClick={() => setActiveTab('about')}
               className="group px-8 py-4 bg-church-gold text-church-navy font-black rounded-full hover:bg-white hover:scale-105 transition-all shadow-xl shadow-church-gold/20 flex items-center gap-3 uppercase text-[10px] tracking-widest"
             >
-              Conócenos <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+              {t.knowUs} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
             </button>
             <button 
               onClick={() => setActiveTab('events')}
               className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white/20 transition-all uppercase text-[10px] tracking-widest"
             >
-              Ver Calendario
+              {t.viewCalendar}
             </button>
           </motion.div>
 
@@ -124,7 +149,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
             style={{ color: '#2e416c' }}
             className="flex items-center justify-center gap-3 font-sans text-[10px] uppercase tracking-[0.3em] font-black bg-white/5 backdrop-blur-md px-5 py-3 rounded-full border border-white/10 w-fit mx-auto hover:bg-white/10 hover:border-white/20 transition-all duration-300 shadow-lg cursor-default"
           >
-            <Clock className="w-4 h-4 text-church-gold" /> Culto Dominical 10:00 AM
+            <Clock className="w-4 h-4 text-church-gold" /> {t.sundayWorship}
           </motion.div>
         </div>
       </section>
@@ -134,9 +159,9 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
         <section className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col gap-1 items-center md:items-start text-center md:text-left mb-6">
             <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px] flex items-center gap-1.5 justify-center md:justify-start">
-              <Bell className="w-3.5 h-3.5 animate-bounce text-church-gold" /> Comunicados Último Minuto
+              <Bell className="w-3.5 h-3.5 animate-bounce text-church-gold" /> {t.lastMinute}
             </span>
-            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Avisos Especiales</h2>
+            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">{t.announcements}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
             {quickNotices.map((notice, index) => (
@@ -170,8 +195,8 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
           <div className="lg:col-span-8 bg-white rounded-[2rem] p-5 md:p-6 shadow-soft border border-slate-100 flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex flex-col gap-0.5">
-                 <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Agenda Semanal</span>
-                 <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Nuestros Cultos</h2>
+                 <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">{t.weeklyAgenda}</span>
+                 <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">{t.ourServices}</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -180,13 +205,13 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                     <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center mb-2 group-hover:bg-church-gold group-hover:text-white transition-colors duration-300">
                        <Clock className="w-4 h-4 text-church-gold group-hover:text-white" />
                     </div>
-                    <p className="font-sans font-black text-church-navy uppercase tracking-widest text-[9px] mb-0.5">{service.day}</p>
+                    <p className="font-sans font-black text-church-navy uppercase tracking-widest text-[9px] mb-0.5">{translateText(service.day, currentLang)}</p>
                     <h4 className="text-base font-serif font-bold mb-0.5">{service.time}</h4>
-                    <p className="text-slate-500 text-xs leading-relaxed">{service.description}</p>
+                    <p className="text-slate-500 text-xs leading-relaxed">{translateText(service.description, currentLang)}</p>
                   </div>
                 )) : (
                   <div className="col-span-2 py-8 text-center">
-                    <p className="text-slate-300 italic font-serif text-lg">Nuestros horarios se están actualizando...</p>
+                    <p className="text-slate-300 italic font-serif text-lg">{t.servicesEmpty}</p>
                   </div>
                 )}
               </div>
@@ -199,10 +224,10 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-church-gold/60 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-church-gold"></span>
                     </span>
-                    Servicio Dominical
+                    {t.sundayServiceLive}
                   </div>
                   <p className="text-xs md:text-sm text-church-navy/80 font-bold leading-relaxed">
-                    Acompañe nuestro servicio dominical en Facebook Live. Comienza a las 11:15 de la mañana.
+                    {t.facebookInvite}
                   </p>
                 </div>
                 <a 
@@ -211,7 +236,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-church-navy hover:bg-church-navy/90 text-white text-[10px] uppercase tracking-widest font-black rounded-xl whitespace-nowrap self-start md:self-auto text-center shadow-sm transition-all duration-300 hover:scale-105 active:scale-98 cursor-pointer"
                 >
-                  ¡Usted es nuestro invitado!
+                  {t.guestInvite}
                 </a>
               </div>
             </div>
@@ -225,9 +250,9 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                   <div className="w-8 h-8 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center mb-3 border border-white/10 group-hover:scale-110 transition-transform">
                     <Sparkles className="w-4 h-4 text-church-gold" />
                   </div>
-                  <h3 style={{ color: '#dca300' }} className="text-lg font-serif font-black mb-1">{settings.welcomeTitle || '¡Bienvenidos!'}</h3>
+                  <h3 style={{ color: '#dca300' }} className="text-lg font-serif font-black mb-1">{translateText(settings.welcomeTitle || '¡Bienvenidos!', currentLang)}</h3>
                   <p className="text-slate-200 text-xs leading-relaxed font-medium italic">
-                    "{settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.'}"
+                    "{translateText(settings.welcomeMessage || 'Qué alegría que estés aquí. Gracias por visitar nuestra casa online. Oramos para que este espacio sea de gran bendición y edificación para tu vida.', currentLang)}"
                   </p>
                 </div>
 
@@ -264,7 +289,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                       rel="noopener noreferrer"
                       className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-[#D4AF37] hover:text-white transition-colors"
                     >
-                      Cómo Llegar <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform" />
+                      {t.howToGetThere} <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </div>
                 </div>
@@ -278,8 +303,8 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
       {events && events.length > 0 && (
         <section className="max-w-6xl mx-auto px-6 space-y-8">
           <div className="flex flex-col gap-0.5 text-center md:text-left">
-             <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">Próximas Actividades</span>
-             <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Eventos Especiales</h2>
+             <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">{t.upcomingActivities}</span>
+             <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">{t.specialEvents}</h2>
           </div>
           <div className="space-y-5">
             {events.map((event) => (
@@ -288,7 +313,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                   <div className="h-[180px] lg:h-auto lg:min-h-[220px] overflow-hidden">
                     <img 
                       src={event.imageUrl} 
-                      alt={event.title}
+                      alt={translateText(event.title, currentLang || 'es')}
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       referrerPolicy="no-referrer"
                     />
@@ -298,20 +323,20 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                     <div className="space-y-1.5 relative z-10">
                       <div className="inline-flex items-center gap-2 bg-slate-50 text-church-navy px-2.5 py-0.5 rounded-full text-[8px] font-black tracking-widest uppercase border border-slate-100">
                         <Calendar className="w-3 h-3 text-church-gold" />
-                        <span>{event.date} {event.time ? ` | ${event.time}` : ''}</span>
+                        <span>{translateText(event.date, currentLang || 'es')} {event.time ? ` | ${event.time}` : ''}</span>
                       </div>
                       <h3 className="text-xl md:text-2xl font-serif font-black text-church-navy leading-tight">
-                        {event.title}
+                        {translateText(event.title, currentLang || 'es')}
                       </h3>
                       <p className="text-slate-500 text-xs md:text-sm leading-relaxed line-clamp-2">
-                        {event.description}
+                        {translateText(event.description, currentLang || 'es')}
                       </p>
                     </div>
                     <button 
                       onClick={() => setActiveTab('events')}
                       className="relative z-10 px-5 py-2.5 bg-church-navy text-white font-black rounded-full w-fit hover:bg-church-gold transition-all self-start uppercase text-[8px] tracking-widest shadow-lg shadow-church-navy/5"
                     >
-                      Más Información
+                      {t.moreInfo}
                     </button>
                   </div>
                 </div>
@@ -347,23 +372,23 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
             <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-sm">
               <HeartHandshake className="w-6 h-6 text-church-gold" />
             </div>
-            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">¿Podemos Orar por Ti?</span>
-            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Pedidos de Oración</h2>
+            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">{t.bibleTitle}</span>
+            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">{t.prayerTitle}</h2>
             <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
-              Comparte con nosotros tus peticiones de oración. Nuestro equipo de intercesores y pastores estarán clamando al Señor por tu vida, tu familia y tus necesidades.
+              {t.prayerDesc}
             </p>
           </div>
 
-          <form onSubmit={handlePrayerSubmit} className="relative z-10 max-w-xl mx-auto space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handlePrayerSubmit} className="relative z-10 max-w-2xl mx-auto space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
-                  Nombre Completo <span className="text-red-500">*</span>
+                  {t.fullname} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Tu nombre"
+                  placeholder={t.fullnamePlaceholder}
                   value={prayerName}
                   onChange={(e) => setPrayerName(e.target.value)}
                   className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300"
@@ -373,13 +398,27 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
 
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
-                  Teléfono (Opcional)
+                  {t.phone}
                 </label>
                 <input
                   type="tel"
-                  placeholder="(000) 000-0000"
+                  placeholder={t.phonePlaceholder}
                   value={prayerPhone}
-                  onChange={(e) => setPrayerPhone(e.target.value)}
+                  onChange={(e) => setPrayerPhone(formatUSPhone(e.target.value))}
+                  className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
+                  {t.email}
+                </label>
+                <input
+                  type="email"
+                  placeholder={t.emailPlaceholder}
+                  value={prayerEmail}
+                  onChange={(e) => setPrayerEmail(e.target.value)}
                   className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300"
                   disabled={isSubmitting}
                 />
@@ -388,12 +427,12 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
 
             <div className="space-y-1.5">
               <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
-                Motivo/Pedido de Oración <span className="text-red-500">*</span>
+                {t.motif} <span className="text-red-500">*</span>
               </label>
               <textarea
                 required
                 rows={4}
-                placeholder="Escribe aquí tu petición o mensaje para oración..."
+                placeholder={t.motifPlaceholder}
                 value={prayerRequest}
                 onChange={(e) => setPrayerRequest(e.target.value)}
                 className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300 resize-none"
@@ -418,7 +457,7 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                 className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs font-medium flex items-center justify-center gap-2"
               >
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>¡Petición de oración enviada con éxito! Estaremos intercediendo por ti de inmediato.</span>
+                <span>{t.success}</span>
               </motion.div>
             )}
 
@@ -433,12 +472,12 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span>Transmitiendo clamor...</span>
+                  <span>{t.submitting}</span>
                 </>
               ) : (
                 <>
                   <Send className="w-3.5 h-3.5" />
-                  <span>Enviar Motivo de Oración</span>
+                  <span>{t.sendRequest}</span>
                 </>
               )}
             </button>
