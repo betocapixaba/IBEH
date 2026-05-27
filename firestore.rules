@@ -1,9 +1,66 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Helper functions for basic type and ID validation
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    // Default deny rule as a catch-all
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
+    }
+
+    // Settings collection
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isValidId(settingId);
+    }
+
+    // Services collection
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isValidId(serviceId);
+    }
+
+    // Events collection
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isValidId(eventId);
+    }
+
+    // Gallery collection
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow write: if isValidId(itemId);
+    }
+
+    // Quick notices collection
+    match /quick_notices/{noticeId} {
+      allow read: if true;
+      allow write: if isValidId(noticeId);
+    }
+
+    // Admin accounts collection
+    match /admin_accounts/{id} {
+      allow read, write: if isValidId(id);
+    }
+
+    // Prayer requests collection
+    match /prayer_requests/{requestId} {
+      // Allow public creation of valid prayer requests
+      allow create: if isValidId(requestId) 
+        && request.resource.data.name is string 
+        && request.resource.data.name.size() > 0 
+        && request.resource.data.name.size() <= 150
+        && request.resource.data.request is string 
+        && request.resource.data.request.size() > 0 
+        && request.resource.data.request.size() <= 2000;
+        
+      // Allow read and delete (for the admin dashboard managers)
+      allow read, delete: if true;
+      allow update: if false; // Prayer requests are immutable
     }
   }
 }
-

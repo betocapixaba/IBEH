@@ -32,7 +32,8 @@ import {
   MapPin,
   X,
   History,
-  Bell
+  Bell,
+  HeartHandshake
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -73,7 +74,10 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
 
   // Users Database State
   const [adminUsers, setAdminUsers] = useState<AdminAccount[]>([]);
-  const [activePanel, setActivePanel] = useState<'settings' | 'pastor' | 'history' | 'services' | 'events' | 'gallery' | 'users' | 'notices'>('settings');
+  const [activePanel, setActivePanel] = useState<'settings' | 'pastor' | 'history' | 'services' | 'events' | 'gallery' | 'users' | 'notices' | 'prayers'>('settings');
+
+  // Prayer Requests State
+  const [prayerRequests, setPrayerRequests] = useState<any[]>([]);
 
   // User management form state
   const [newUserId, setNewUserId] = useState('');
@@ -183,10 +187,29 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
             accounts: true
           }
         };
-        setDoc(doc(db, 'admin_accounts', 'admin'), defaultAdmin);
+        setDoc(doc(db, 'admin_accounts', 'admin'), defaultAdmin).catch(err => {
+          console.error("Error seeding default admin:", err);
+        });
       }
+    }, (error) => {
+      console.error("Firestore onSnapshot admin_accounts error:", error);
     });
 
+    return () => unsub();
+  }, []);
+
+  // Listen to prayer requests
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, 'prayer_requests'), (snap) => {
+      const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPrayerRequests(list.sort((a: any, b: any) => {
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+        return b.createdAt.localeCompare(a.createdAt);
+      }));
+    }, (error) => {
+      console.error("Firestore onSnapshot prayer_requests error:", error);
+    });
     return () => unsub();
   }, []);
 
@@ -195,7 +218,45 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
     setLoginError('');
 
     const trimmedId = userId.trim().toLowerCase();
-    const found = adminUsers.find(u => u.id.toLowerCase() === trimmedId);
+    
+    // Find the user inside administrative users state
+    let found = adminUsers.find(u => u.id.toLowerCase() === trimmedId);
+
+    // Dynamic self-healing fallback: If admin isn't loaded or doesn't exist yet, we still allow logging in with the default credentials
+    if (!found && trimmedId === 'admin') {
+      found = {
+        id: 'admin',
+        username: 'Administrador General',
+        password: 'admin123',
+        role: 'super_admin',
+        permissions: {
+          settings: true,
+          services: true,
+          events: true,
+          gallery: true,
+          accounts: true
+        }
+      };
+
+      // Try to re-seed the admin document in the background
+      try {
+        setDoc(doc(db, 'admin_accounts', 'admin'), {
+          id: 'admin',
+          username: 'Administrador General',
+          password: 'admin123',
+          role: 'super_admin',
+          permissions: {
+            settings: true,
+            services: true,
+            events: true,
+            gallery: true,
+            accounts: true
+          }
+        });
+      } catch (err) {
+        console.error("Failed to restore default admin doc in background:", err);
+      }
+    }
 
     if (found && found.password === password) {
       setLoggedUser(found);
@@ -1032,6 +1093,7 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
             { id: 'events', name: 'Eventos y Actividades', icon: Calendar, allowed: loggedUser.permissions.events },
             { id: 'gallery', name: 'Galería de Memorias', icon: Camera, allowed: loggedUser.permissions.gallery },
             { id: 'notices', name: 'Avisos de Última Hora', icon: Bell, allowed: loggedUser.permissions.settings },
+            { id: 'prayers', name: 'Pedidos de Oración', icon: HeartHandshake, allowed: true },
             { id: 'users', name: 'Cuentas de Acceso', icon: Users, allowed: loggedUser.role === 'super_admin' || loggedUser.permissions.accounts },
           ].map((panel) => {
             if (!panel.allowed) return null;
@@ -2576,6 +2638,123 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                   <div className="p-12 text-center bg-slate-50/50 rounded-[2rem] border border-dashed border-slate-200 space-y-3">
                     <Bell className="w-10 h-10 text-slate-300 mx-auto animate-pulse" />
                     <p className="text-slate-400 text-sm font-medium">Nenhum aviso de última hora publicado ainda.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* MANAGING PRAYER REQUESTS PANEL */}
+          {activePanel === 'prayers' && (
+            <div className="space-y-10 animate-in fade-in duration-300">
+              <div>
+                <h3 className="text-2xl font-serif font-bold text-church-navy">Pedidos de Oración Recibidos</h3>
+                <p className="text-slate-500 text-sm mt-1">
+                  Revise las peticiones presentadas por la congregación y los visitantes del sitio web.
+                </p>
+              </div>
+
+              {/* Stats Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white border border-slate-100 p-6 rounded-[2rem] shadow-soft flex items-center gap-4">
+                  <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100 shadow-sm shrink-0">
+                    <HeartHandshake className="w-6 h-6 text-church-gold" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Total Recibidos</span>
+                    <span className="text-2xl font-black text-church-navy">{prayerRequests.length}</span>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-slate-100 p-6 rounded-[2rem] shadow-soft flex items-center gap-4">
+                  <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm shrink-0">
+                    <Calendar className="w-6 h-6 text-church-navy" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest block">Último Recibido</span>
+                    <span className="text-xs font-bold text-church-navy truncate max-w-[180px] block font-mono">
+                      {prayerRequests.length > 0 
+                        ? new Date(prayerRequests[0].createdAt || '').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                        : 'No hay pedidos aún'
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* List Container */}
+              <div className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-slate-50 shadow-soft space-y-6">
+                {prayerRequests.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {prayerRequests.map((req) => (
+                      <div 
+                        key={req.id} 
+                        className="p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100 shadow-sm hover:shadow-soft hover:bg-white transition-all duration-300 relative group flex flex-col justify-between"
+                      >
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start gap-3">
+                            <div>
+                              <h4 className="font-serif font-black text-lg text-church-navy leading-tight">{req.name}</h4>
+                              {req.phone ? (
+                                <a 
+                                  href={`tel:${req.phone}`} 
+                                  className="text-[10px] font-bold text-church-gold hover:underline flex items-center gap-1.5 mt-1"
+                                >
+                                  <Clock className="w-3.5 h-3.5" />
+                                  <span>{req.phone}</span>
+                                </a>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 italic block mt-1">Sin teléfono</span>
+                              )}
+                            </div>
+                            <span className="text-[9px] font-mono text-slate-400 font-bold bg-white border border-slate-100 px-2.5 py-1 rounded-full uppercase shrink-0">
+                              {req.createdAt 
+                                ? new Date(req.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                                : 'Sin fecha'
+                              }
+                            </span>
+                          </div>
+
+                          <div className="border-t border-slate-100 pt-3">
+                            <p className="text-xs text-slate-600 leading-relaxed italic font-serif">
+                              "{req.request}"
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end pt-4 border-t border-slate-100/50 mt-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              triggerConfirmation(
+                                'Eliminar Pedido de Oración',
+                                `¿Está seguro de que desea eliminar permanentemente el pedido de oración de "${req.name}"? Esta acción es irreversible.`,
+                                async () => {
+                                  try {
+                                    await deleteDoc(doc(db, 'prayer_requests', req.id));
+                                  } catch (e) {
+                                    console.error(e);
+                                    alert('Error al eliminar el pedido.');
+                                  }
+                                }
+                              );
+                            }}
+                            className="text-xs font-black text-red-500 hover:text-red-600 uppercase tracking-widest flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-red-50/50 transition-all cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Eliminar</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-20 bg-slate-50/10 rounded-[2rem] border border-dashed border-slate-200">
+                    <HeartHandshake className="w-12 h-12 text-slate-350 mx-auto animate-pulse mb-3" />
+                    <h4 className="font-serif font-bold text-lg text-church-navy">No se han recibido pedidos de oración</h4>
+                    <p className="text-slate-400 text-sm max-w-sm mx-auto mt-1">
+                      Los pedidos de oración que se envíen desde la página de inicio aparecerán aquí en tiempo real de forma automática.
+                    </p>
                   </div>
                 )}
               </div>

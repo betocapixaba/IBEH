@@ -1,7 +1,10 @@
+import { useState, FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, Clock, MapPin, ArrowRight, Church, Sparkles, Bell } from 'lucide-react';
+import { Calendar, Clock, MapPin, ArrowRight, Church, Sparkles, Bell, HeartHandshake, Send, Check } from 'lucide-react';
 import { Service, Event, ChurchSettings, QuickNotice } from '../types';
 import churchMapImg from '../assets/images/church_map_1779745801080.png';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 interface HomeProps {
   services: Service[];
@@ -12,6 +15,49 @@ interface HomeProps {
 }
 
 export default function Home({ services, events, quickNotices, setActiveTab, settings }: HomeProps) {
+  const [prayerName, setPrayerName] = useState('');
+  const [prayerPhone, setPrayerPhone] = useState('');
+  const [prayerRequest, setPrayerRequest] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handlePrayerSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!prayerName.trim() || !prayerRequest.trim()) {
+      setSubmitError('Por favor, rellene todos los campos obligatorios (*).');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+    setSubmitSuccess(false);
+
+    try {
+      await addDoc(collection(db, 'prayer_requests'), {
+        name: prayerName.trim(),
+        phone: prayerPhone.trim(),
+        request: prayerRequest.trim(),
+        createdAt: new Date().toISOString()
+      });
+      
+      setSubmitSuccess(true);
+      setPrayerName('');
+      setPrayerPhone('');
+      setPrayerRequest('');
+    } catch (error) {
+      console.error('Error submitting prayer request:', error);
+      setSubmitError('Hubo un error al enviar su pedido. Inténtelo de nuevo.');
+      try {
+        handleFirestoreError(error, OperationType.CREATE, 'prayer_requests');
+      } catch (formattedError) {
+        // Log original formatted JSON string
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-12 pb-8">
       {/* Hero Section - Refined */}
@@ -288,6 +334,115 @@ export default function Home({ services, events, quickNotices, setActiveTab, set
             <p className="font-sans font-black text-church-gold uppercase tracking-[0.5em] text-[10px]">Jeremías 29:11</p>
             <p className="text-slate-400 text-xs italic">Santas Escrituras</p>
           </div>
+        </div>
+      </section>
+
+      {/* Seção de Pedido de Oração (Prayer Requests) */}
+      <section className="max-w-4xl mx-auto px-6">
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-soft p-6 md:p-10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-church-gold/5 rounded-full blur-[80px] -translate-y-1/3 translate-x-1/3 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-church-navy/5 rounded-full blur-[60px] translate-y-1/3 -translate-x-1/3 pointer-events-none" />
+          
+          <div className="relative z-10 max-w-2xl mx-auto text-center space-y-3 mb-8">
+            <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 shadow-sm">
+              <HeartHandshake className="w-6 h-6 text-church-gold" />
+            </div>
+            <span className="text-church-gold font-black uppercase tracking-[0.4em] text-[10px]">¿Podemos Orar por Ti?</span>
+            <h2 className="text-2xl md:text-3xl font-serif font-black text-church-navy">Pedidos de Oración</h2>
+            <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
+              Comparte con nosotros tus peticiones de oración. Nuestro equipo de intercesores y pastores estarán clamando al Señor por tu vida, tu familia y tus necesidades.
+            </p>
+          </div>
+
+          <form onSubmit={handlePrayerSubmit} className="relative z-10 max-w-xl mx-auto space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
+                  Nombre Completo <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Tu nombre"
+                  value={prayerName}
+                  onChange={(e) => setPrayerName(e.target.value)}
+                  className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
+                  Teléfono (Opcional)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="(000) 000-0000"
+                  value={prayerPhone}
+                  onChange={(e) => setPrayerPhone(e.target.value)}
+                  className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300"
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-bold text-church-navy uppercase tracking-wider">
+                Motivo/Pedido de Oración <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                required
+                rows={4}
+                placeholder="Escribe aquí tu petición o mensaje para oración..."
+                value={prayerRequest}
+                onChange={(e) => setPrayerRequest(e.target.value)}
+                className="w-full bg-slate-50/50 border border-slate-200/80 rounded-xl px-4 py-2.5 text-xs text-church-navy font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-church-gold/20 focus:border-church-gold focus:bg-white transition-all duration-300 resize-none"
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {submitError && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs font-semibold text-center"
+              >
+                {submitError}
+              </motion.div>
+            )}
+
+            {submitSuccess && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl text-xs font-medium flex items-center justify-center gap-2"
+              >
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>¡Petición de oración enviada con éxito! Estaremos intercediendo por ti de inmediato.</span>
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-church-navy text-white hover:bg-church-gold text-[10px] font-black tracking-[0.2em] uppercase rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-church-navy/10 active:scale-[0.98] disabled:opacity-55 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Transmitiendo clamor...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Enviar Motivo de Oración</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </section>
     </div>

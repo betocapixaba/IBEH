@@ -63,6 +63,18 @@
         "createdAt": { "type": "string" }
       },
       "required": ["title", "content", "bgColor", "titleColor", "contentColor", "width", "minHeight", "createdAt"]
+    },
+    "PrayerRequest": {
+      "title": "Prayer Request",
+      "description": "Prayer request submitted by website visitors",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "request": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "request", "createdAt"]
     }
   },
   "firestore": {
@@ -85,6 +97,10 @@
     "/quick_notices/{noticeId}": {
       "schema": "QuickNotice",
       "description": "Customizable last-minute church announcement cards"
+    },
+    "/prayer_requests/{requestId}": {
+      "schema": "PrayerRequest",
+      "description": "Prayer requests submitted by visitors"
     }
   }
 }
