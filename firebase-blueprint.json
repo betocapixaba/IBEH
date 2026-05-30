@@ -75,6 +75,46 @@
         "createdAt": { "type": "string" }
       },
       "required": ["name", "request", "createdAt"]
+    },
+    "RegisteredUser": {
+      "title": "Registered User",
+      "description": "Registered visitor or church member details",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "createdAt"]
+    },
+    "GalleryComment": {
+      "title": "Gallery Comment",
+      "description": "User comment on a photo gallery item",
+      "type": "object",
+      "properties": {
+        "galleryId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorEmail": { "type": "string" },
+        "userId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["galleryId", "authorName", "authorEmail", "userId", "text", "createdAt"]
+    },
+    "GalleryReaction": {
+      "title": "Gallery Reaction",
+      "description": "User selection/reactions on a photo gallery memory entry",
+      "type": "object",
+      "properties": {
+        "galleryId": { "type": "string" },
+        "userId": { "type": "string" },
+        "likes": { "type": "boolean" },
+        "loves": { "type": "boolean" },
+        "amens": { "type": "boolean" },
+        "bless": { "type": "boolean" }
+      },
+      "required": ["galleryId", "userId", "likes", "loves", "amens", "bless"]
     }
   },
   "firestore": {
@@ -101,6 +141,18 @@
     "/prayer_requests/{requestId}": {
       "schema": "PrayerRequest",
       "description": "Prayer requests submitted by visitors"
+    },
+    "/registered_users/{userId}": {
+      "schema": "RegisteredUser",
+      "description": "System registered members and users"
+    },
+    "/gallery_comments/{commentId}": {
+      "schema": "GalleryComment",
+      "description": "Persistent user comments on photo gallery memory entries"
+    },
+    "/gallery_reactions/{reactionId}": {
+      "schema": "GalleryReaction",
+      "description": "Persistent individual reaction settings per user per gallery item"
     }
   }
 }

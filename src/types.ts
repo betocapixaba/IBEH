@@ -67,9 +67,11 @@ export interface GalleryItem {
   id: string;
   title: string;
   date: string;
-  url: string;
+  url: string; // The selected thumbnail/cover URL
+  urls?: string[]; // Array of all photos in this post/album
   type: 'photo' | 'video';
   eventName?: string;
+  description?: string; // Facebook-style post description
 }
 
 export interface Ministry {

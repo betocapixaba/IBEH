@@ -133,18 +133,31 @@ export default function App() {
       }
     });
 
+    // One-time purge of initial default photos/comments so the user can start from absolute scratch
+    const purgeDatabase = async () => {
+      const hasPurged = localStorage.getItem('gallery_purged_v2');
+      if (!hasPurged) {
+        try {
+          const { getDocs, query, collection, deleteDoc, doc } = await import('firebase/firestore');
+          const gallerySnap = await getDocs(collection(db, 'gallery'));
+          for (const d of gallerySnap.docs) {
+            await deleteDoc(doc(db, 'gallery', d.id));
+          }
+          const commentsSnap = await getDocs(collection(db, 'gallery_comments'));
+          for (const d of commentsSnap.docs) {
+            await deleteDoc(doc(db, 'gallery_comments', d.id));
+          }
+          localStorage.setItem('gallery_purged_v2', 'true');
+        } catch (err) {
+          console.error("Error clearing initial items:", err);
+        }
+      }
+    };
+    purgeDatabase();
+
     const unsubGallery = onSnapshot(collection(db, 'gallery'), (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem));
       setGallery(data);
-      
-      if (snap.empty) {
-        setDoc(doc(collection(db, 'gallery')), { 
-          title: 'Retiro de Jóvenes', 
-          date: 'Mayo 2024', 
-          url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=800', 
-          type: 'photo' 
-        });
-      }
     });
 
     const unsubNotices = onSnapshot(collection(db, 'quick_notices'), (snap) => {

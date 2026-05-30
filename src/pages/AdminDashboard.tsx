@@ -571,6 +571,8 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
     setGalleryFormDay('');
     setGalleryFormMonth(currentMonth);
     setGalleryFormYear(currentYear.toString());
+    const today = new Date().toISOString().split('T')[0];
+    setGalleryFormDate(today);
     setGalleryFormUrl('');
     setGalleryFormUrls([]);
     setGalleryFormType('photo');
@@ -604,8 +606,17 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
     setGalleryFormMonth(month);
     setGalleryFormYear(year);
 
+    // Synchronize galleryFormDate from the fields
+    const monthsEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const mIdx = monthsEs.findIndex(m => m.toLowerCase() === month.toLowerCase());
+    const mInt = mIdx !== -1 ? mIdx + 1 : 5;
+    const dInt = parseInt(day, 10) || 1;
+    const yInt = parseInt(year, 10) || new Date().getFullYear();
+    const formattedDate = `${yInt}-${String(mInt).padStart(2, '0')}-${String(dInt).padStart(2, '0')}`;
+    setGalleryFormDate(formattedDate);
+
     setGalleryFormUrl(item.url);
-    setGalleryFormUrls([item.url]);
+    setGalleryFormUrls(item.urls || [item.url]);
     setGalleryFormType(item.type);
     setIsGalleryFormOpen(true);
   };
@@ -958,37 +969,54 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
 
     finalUrls = finalUrls.filter(url => url.trim() !== '');
 
-    const computedDate = galleryFormDay.trim()
-      ? `${galleryFormDay.trim()} de ${galleryFormMonth}, ${galleryFormYear}`
-      : `${galleryFormMonth} ${galleryFormYear}`;
+    let computedDate = '';
+    if (galleryFormDate) {
+      const dateParts = galleryFormDate.split('-');
+      if (dateParts.length === 3) {
+        const yStr = dateParts[0];
+        const mInt = parseInt(dateParts[1], 10);
+        const dInt = parseInt(dateParts[2], 10);
+        const monthsEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        const mStr = monthsEs[mInt - 1] || 'Mayo';
+        computedDate = `${dInt} de ${mStr}, ${yStr}`;
+      } else {
+        computedDate = galleryFormDate;
+      }
+    } else {
+      computedDate = galleryFormDay.trim()
+        ? `${galleryFormDay.trim()} de ${galleryFormMonth}, ${galleryFormYear}`
+        : `${galleryFormMonth} ${galleryFormYear}`;
+    }
 
     if (!galleryFormTitle || !computedDate || finalUrls.length === 0) {
       alert('El título, la fecha y al menos una imagen son requeridos.');
       return;
     }
 
+    const chosenThumbnailUrl = finalUrls.includes(galleryFormUrl) ? galleryFormUrl : finalUrls[0];
+
     try {
       if (editingGalleryItem) {
-        // Edit single item
+        // Edit single event album
         await setDoc(doc(db, 'gallery', editingGalleryItem.id), {
           title: galleryFormTitle,
           eventName: galleryFormEventName,
           date: computedDate,
-          url: finalUrls[0],
+          url: chosenThumbnailUrl,
+          urls: finalUrls,
           type: galleryFormType
         });
       } else {
-        // Create multiple items with the exact same details
-        for (const url of finalUrls) {
-          const id = Math.random().toString(36).substring(2, 9);
-          await setDoc(doc(db, 'gallery', id), {
-            title: galleryFormTitle,
-            eventName: galleryFormEventName,
-            date: computedDate,
-            url: url,
-            type: galleryFormType
-          });
-        }
+        // Create an album/post with a collection of photos where one is chosen to be the cover/thumbnail
+        const id = Math.random().toString(36).substring(2, 9);
+        await setDoc(doc(db, 'gallery', id), {
+          title: galleryFormTitle,
+          eventName: galleryFormEventName,
+          date: computedDate,
+          url: chosenThumbnailUrl,
+          urls: finalUrls,
+          type: galleryFormType
+        });
       }
       setIsGalleryFormOpen(false);
       setEditingGalleryItem(null);
@@ -1985,42 +2013,26 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                     </div>
 
                     <div className="md:col-span-2 space-y-2">
-                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha del Recuerdo (Día, Mes y Año)</label>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-slate-400 font-bold">Día</span>
-                          <input 
-                            type="text" 
-                            placeholder="Ej. 15 (Opcional)"
-                            maxLength={2}
-                            value={galleryFormDay}
-                            onChange={(e) => setGalleryFormDay(e.target.value.replace(/\D/g, ''))}
-                            className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium font-sans text-xs"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-slate-400 font-bold">Mes del Año</span>
-                          <select 
-                            value={galleryFormMonth}
-                            onChange={(e) => setGalleryFormMonth(e.target.value)}
-                            className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-bold font-sans text-xs"
-                          >
-                            {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map(m => (
-                              <option key={m} value={m}>{m}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-slate-400 font-bold">Año</span>
-                          <input 
-                            type="number" 
-                            placeholder="Año"
-                            value={galleryFormYear}
-                            onChange={(e) => setGalleryFormYear(e.target.value)}
-                            className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-medium font-sans text-xs"
-                          />
-                        </div>
-                      </div>
+                      <label className="text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha del Recuerdo</label>
+                      <input 
+                        type="date"
+                        value={galleryFormDate}
+                        onChange={(e) => {
+                          setGalleryFormDate(e.target.value);
+                          if (e.target.value) {
+                            const parts = e.target.value.split('-');
+                            if (parts.length === 3) {
+                              setGalleryFormDay(parts[2]);
+                              const monthsEs = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                              const mInt = parseInt(parts[1], 10);
+                              setGalleryFormMonth(monthsEs[mInt - 1] || 'Mayo');
+                              setGalleryFormYear(parts[0]);
+                            }
+                          }
+                        }}
+                        className="w-full p-3.5 bg-white rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-church-gold/20 text-slate-800 font-bold font-sans text-sm"
+                        required
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -2112,52 +2124,80 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                       {/* Multi-Photo Preview Box */}
                       {(galleryFormUrls.length > 0 || galleryFormUrl) && (
                         <div className="space-y-3 border border-slate-150 p-5 bg-white rounded-3xl">
-                          <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                              Fotos a Registrar ({galleryFormUrls.length || (galleryFormUrl ? 1 : 0)})
-                            </p>
-                            {galleryFormUrls.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => setGalleryFormUrls([])}
-                                className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase"
-                              >
-                                Limpiar Todas
-                              </button>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                            {galleryFormUrls.map((url, index) => (
-                              <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200 group">
-                                <img src={url} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+                          <div className="flex flex-col gap-1 border-b border-slate-100 pb-3">
+                            <div className="flex justify-between items-center">
+                              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                                Fotos a Registrar ({galleryFormUrls.length || (galleryFormUrl ? 1 : 0)})
+                              </p>
+                              {galleryFormUrls.length > 1 && (
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    setGalleryFormUrls(prev => prev.filter((_, i) => i !== index));
-                                    if (galleryFormUrl === url) {
-                                      setGalleryFormUrl('');
-                                    }
+                                    setGalleryFormUrls([]);
+                                    setGalleryFormUrl('');
                                   }}
-                                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-650 text-white rounded-full p-1 shadow-md transition-colors"
-                                  title="Remover"
+                                  className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase"
                                 >
-                                  <X className="w-3 h-3" />
+                                  Limpiar Todas
                                 </button>
-                              </div>
-                            ))}
+                              )}
+                            </div>
+                            <p className="text-[10px] text-church-gold font-bold">
+                              💡 Haz clic en una foto para seleccionarla como la Portada (Miniatura) del post.
+                            </p>
+                          </div>
+                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                            {galleryFormUrls.map((url, index) => {
+                              const isThumbnail = galleryFormUrl === url || (!galleryFormUrl && index === 0);
+                              return (
+                                <div 
+                                  key={index} 
+                                  onClick={() => setGalleryFormUrl(url)}
+                                  className={`relative aspect-square rounded-xl overflow-hidden bg-slate-100 transition-all cursor-pointer ${isThumbnail ? 'ring-4 ring-church-gold scale-95 shadow-md' : 'border border-slate-200 hover:scale-105'}`}
+                                >
+                                  <img src={url} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+                                  {isThumbnail && (
+                                    <span className="absolute bottom-1 right-1 bg-church-gold text-white text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow">
+                                      Portada
+                                    </span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const nextUrls = galleryFormUrls.filter((_, i) => i !== index);
+                                      setGalleryFormUrls(nextUrls);
+                                      if (galleryFormUrl === url) {
+                                        setGalleryFormUrl(nextUrls[0] || '');
+                                      }
+                                    }}
+                                    className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-all scale-75 hover:scale-100"
+                                    title="Remover"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              );
+                            })}
                             {galleryFormUrl && !galleryFormUrls.includes(galleryFormUrl) && (
-                              <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-200 group ring-2 ring-church-gold/30">
+                              <div 
+                                onClick={() => setGalleryFormUrl(galleryFormUrl)}
+                                className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 ring-4 ring-church-gold/50 scale-95 shadow-md cursor-pointer"
+                              >
                                 <img src={galleryFormUrl} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-[9px] text-white font-bold pointer-events-none">
-                                  Por Añadir
+                                <div className="absolute inset-x-0 bottom-0 bg-black/60 flex items-center justify-center py-1 text-[8px] text-white font-bold">
+                                  Portada
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => setGalleryFormUrl('')}
-                                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-650 text-white rounded-full p-1 shadow-md transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setGalleryFormUrl('');
+                                  }}
+                                  className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-colors scale-75"
                                   title="Remover"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <X className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             )}
@@ -2188,6 +2228,12 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                     <div className="absolute top-2 right-2 bg-church-navy/80 backdrop-blur-sm text-white text-[8px] px-2 py-0.5 rounded font-black uppercase tracking-widest">
                       {item.type}
                     </div>
+
+                    {item.urls && item.urls.length > 1 && (
+                      <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-church-navy border border-slate-100 text-[8px] px-1.5 py-0.5 rounded-lg font-black uppercase tracking-wider shadow-sm">
+                        Álbum ({item.urls.length})
+                      </div>
+                    )}
 
                     {/* Meta info displayed on hover/always */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4 text-white space-y-1">
