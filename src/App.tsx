@@ -133,31 +133,47 @@ export default function App() {
       }
     });
 
-    // One-time purge of initial default photos/comments so the user can start from absolute scratch
-    const purgeDatabase = async () => {
-      const hasPurged = localStorage.getItem('gallery_purged_v2');
-      if (!hasPurged) {
-        try {
-          const { getDocs, query, collection, deleteDoc, doc } = await import('firebase/firestore');
-          const gallerySnap = await getDocs(collection(db, 'gallery'));
-          for (const d of gallerySnap.docs) {
-            await deleteDoc(doc(db, 'gallery', d.id));
-          }
-          const commentsSnap = await getDocs(collection(db, 'gallery_comments'));
-          for (const d of commentsSnap.docs) {
-            await deleteDoc(doc(db, 'gallery_comments', d.id));
-          }
-          localStorage.setItem('gallery_purged_v2', 'true');
-        } catch (err) {
-          console.error("Error clearing initial items:", err);
-        }
-      }
-    };
-    purgeDatabase();
-
     const unsubGallery = onSnapshot(collection(db, 'gallery'), (snap) => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as GalleryItem));
       setGallery(data);
+      if (snap.empty) {
+        setDoc(doc(collection(db, 'gallery')), {
+          title: 'Culto Dominical de Adoración',
+          eventName: 'Cultos',
+          date: '24 de Mayo, 2026',
+          url: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&q=80&w=1200',
+          urls: [
+            'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&q=80&w=1200'
+          ],
+          type: 'photo',
+          description: 'Qué alegría ver a nuestra congregación reunida, alabando juntos en espíritu y en verdad.'
+        });
+        setDoc(doc(collection(db, 'gallery')), {
+          title: 'Actividades de Jóvenes Cristianos',
+          eventName: 'Reunión de Jóvenes',
+          date: '17 de Mayo, 2026',
+          url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=1200',
+          urls: [
+            'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1200'
+          ],
+          type: 'photo',
+          description: 'Tarde llena de risas, comunión del Espíritu Santo y profundas charlas sobre el discipulado.'
+        });
+        setDoc(doc(collection(db, 'gallery')), {
+          title: 'Vigilia General & Clamor Unido',
+          eventName: 'Vigilias',
+          date: '10 de Mayo, 2026',
+          url: 'https://images.unsplash.com/photo-1544427920-c49ccfb85579?auto=format&fit=crop&q=80&w=1200',
+          urls: [
+            'https://images.unsplash.com/photo-1544427920-c49ccfb85579?auto=format&fit=crop&q=80&w=1200',
+            'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&q=80&w=1200'
+          ],
+          type: 'photo',
+          description: 'Noche de oración por las familias, sanidad divina y bendición sobre nuestra activa comunidad.'
+        });
+      }
     });
 
     const unsubNotices = onSnapshot(collection(db, 'quick_notices'), (snap) => {

@@ -135,7 +135,8 @@ export default function Home({
             </button>
             <button 
               onClick={() => setActiveTab('events')}
-              className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white/20 transition-all uppercase text-[10px] tracking-widest"
+              style={{ backgroundColor: '#171e78' }}
+              className="px-8 py-4 backdrop-blur-md border border-white/30 text-white font-bold rounded-full hover:bg-white/20 transition-all uppercase text-[10px] tracking-widest"
             >
               {t.viewCalendar}
             </button>

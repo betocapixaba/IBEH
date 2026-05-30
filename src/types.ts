@@ -72,6 +72,7 @@ export interface GalleryItem {
   type: 'photo' | 'video';
   eventName?: string;
   description?: string; // Facebook-style post description
+  hidden?: boolean; // Optional flag to hide album from visitors
 }
 
 export interface Ministry {
