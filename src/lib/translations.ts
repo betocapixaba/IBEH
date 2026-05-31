@@ -62,7 +62,7 @@ export const TRANSLATIONS = {
     spiritualLeadership: "Liderazgo Espiritual",
     leadPastor: "Principal",
     weeklyMessage: "Mensaje Semanal",
-    availableSocials: "Disponible en YouTube & Redes Sociales",
+    availableSocials: "Disponible en Facebook",
     viewSermons: "Ver Predicaciones",
     howToGetThere: "Cómo Llegar",
     upcomingActivities: "Próximas Actividades",
@@ -129,7 +129,7 @@ export const TRANSLATIONS = {
     spiritualLeadership: "Spiritual Leadership",
     leadPastor: "Lead Pastor",
     weeklyMessage: "Weekly Message",
-    availableSocials: "Available on YouTube & Social Networks",
+    availableSocials: "Available on Facebook",
     viewSermons: "Watch Sermons",
     howToGetThere: "Get Directions",
     upcomingActivities: "Upcoming Activities",
@@ -196,7 +196,7 @@ export const TRANSLATIONS = {
     spiritualLeadership: "Liderança Espiritual",
     leadPastor: "Pastor Principal",
     weeklyMessage: "Mensagem Semanal",
-    availableSocials: "Disponível no YouTube e Redes Sociais",
+    availableSocials: "Disponível no Facebook",
     viewSermons: "Ver Pregações",
     howToGetThere: "Como Chegar",
     upcomingActivities: "Próximas Atividades",
@@ -263,7 +263,7 @@ export const TRANSLATIONS = {
     spiritualLeadership: "Guida Spirituale",
     leadPastor: "Pastore Principale",
     weeklyMessage: "Messaggio Settimanale",
-    availableSocials: "Disponibile su YouTube e Social Network",
+    availableSocials: "Disponibile su Facebook",
     viewSermons: "Vedi Sermoni",
     howToGetThere: "Come Arrivare",
     upcomingActivities: "Prossime Attività",
@@ -330,7 +330,7 @@ export const TRANSLATIONS = {
     spiritualLeadership: "Leadership Spirituel",
     leadPastor: "Pasteur Principal",
     weeklyMessage: "Message Hebdomadaire",
-    availableSocials: "Disponible sur YouTube et Réseaux Sociaux",
+    availableSocials: "Disponible sur Facebook",
     viewSermons: "Voir les Prédications",
     howToGetThere: "Comment s'y Rendre",
     upcomingActivities: "Activités à Venir",
@@ -359,6 +359,13 @@ export const TRANSLATIONS = {
  * This guarantees the dynamic database seeded strings (or settings defaults) are instantly translated.
  */
 const TEXT_PHRASE_DICTIONARY: Record<string, Record<LanguageCode, string>> = {
+  "Disponible en Facebook": {
+    es: "Disponible en Facebook",
+    en: "Available on Facebook",
+    pt: "Disponível no Facebook",
+    it: "Disponibile su Facebook",
+    fr: "Disponible sur Facebook"
+  },
   // Church Name
   "Iglesia Bautista Emanuel Hartford": {
     es: "Iglesia Bautista Emanuel Hartford",

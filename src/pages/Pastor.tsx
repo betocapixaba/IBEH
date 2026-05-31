@@ -75,12 +75,12 @@ export default function Pastor({ settings, currentLang = 'es' }: PastorProps) {
                 {translateText('Mensaje Semanal', currentLang)}
               </h4>
               <p className="text-sm text-slate-400 mt-1 font-medium italic">
-                {translateText('Disponible en YouTube & Redes Sociales', currentLang)}
+                {translateText('Disponible en Facebook', currentLang)}
               </p>
             </div>
             <button 
               onClick={() => {
-                const url = settings.facebookUrl || settings.youtubeUrl || 'https://www.facebook.com/IBEHARTFORD';
+                const url = settings.facebookUrl || 'https://www.facebook.com/IBEHARTFORD';
                 window.open(url, '_blank');
               }}
               className="px-8 py-4 bg-slate-50 text-church-navy font-black rounded-full hover:bg-church-navy hover:text-white transition-all uppercase text-[10px] tracking-widest border border-slate-100 active:scale-95"
