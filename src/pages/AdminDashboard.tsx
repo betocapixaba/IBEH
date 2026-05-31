@@ -890,8 +890,8 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
   // Content handlers wrapped around permission controls
   const addService = async () => {
     if (!loggedUser?.permissions.services) return;
-    const day = prompt('Día de culto? (Ej. Domingo)');
-    const time = prompt('Hora del culto? (Ej. 10:00 AM)');
+    const day = prompt('Día del servicio? (Ej. Domingo)');
+    const time = prompt('Hora del servicio? (Ej. 10:00 AM)');
     const description = prompt('Breve descripción o pasaje bíblico?');
     if (day && time) {
       try {
@@ -907,8 +907,8 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
   const deleteService = async (id: string) => {
     if (!loggedUser?.permissions.services) return;
     triggerConfirmation(
-      'Eliminar Horario de Culto',
-      '¿Está seguro de que desea eliminar este horario de culto permanentemente?',
+      'Eliminar Horario de Servicio',
+      '¿Está seguro de que desea eliminar este horario de servicio permanentemente?',
       async () => {
         await deleteDoc(doc(db, 'services', id));
         onRefresh();
@@ -1638,7 +1638,7 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
             { id: 'settings', name: 'Identidad y Logo', icon: SettingsIcon, allowed: loggedUser.permissions.settings },
             { id: 'pastor', name: 'Pastor y Redes', icon: Sparkles, allowed: loggedUser.permissions.settings },
             { id: 'history', name: 'Historia', icon: History, allowed: loggedUser.permissions.settings },
-            { id: 'services', name: 'Horarios de Culto', icon: Clock, allowed: loggedUser.permissions.services },
+            { id: 'services', name: 'Horarios de Servicio', icon: Clock, allowed: loggedUser.permissions.services },
             { id: 'events', name: 'Eventos y Actividades', icon: Calendar, allowed: loggedUser.permissions.events },
             { id: 'gallery', name: 'Galería de Memorias', icon: Camera, allowed: loggedUser.permissions.gallery },
             { id: 'notices', name: 'Avisos de Última Hora', icon: Bell, allowed: loggedUser.permissions.settings },
@@ -2195,7 +2195,7 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
             <div className="space-y-8 animate-in fade-in duration-300">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <h3 className="text-2xl font-serif font-bold text-church-navy">Horarios de Culto</h3>
+                  <h3 className="text-2xl font-serif font-bold text-church-navy">Horarios de Servicio</h3>
                   <p className="text-slate-500 text-sm mt-1">Configure los días y horas de las reuniones semanales.</p>
                 </div>
                 <button 
@@ -2849,7 +2849,7 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                                checked={newUserPerms.services}
                                onChange={(e) => setNewUserPerms({ ...newUserPerms, services: e.target.checked })}
                                className="accent-church-gold text-white"
-                             /> Cultos y Horarios
+                             /> Servicios y Horarios
                            </label>
                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-600">
                              <input 
@@ -2890,7 +2890,7 @@ export default function AdminDashboard({ settings, services, events, gallery, qu
                              <p className="text-xs text-slate-600 font-bold bg-white px-2.5 py-1 rounded border border-slate-150 inline-block font-mono">Password: {user.password}</p>
                              <div className="flex gap-1.5 flex-wrap pt-1.5">
                                {user.permissions.settings && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Ajustes</span>}
-                               {user.permissions.services && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Cultos</span>}
+                                {user.permissions.services && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Servicios</span>}
                                {user.permissions.events && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Eventos</span>}
                                {user.permissions.gallery && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Galeria</span>}
                                {user.permissions.accounts && <span className="text-[8px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-black tracking-widest text-[8px] uppercase">Accesos</span>}

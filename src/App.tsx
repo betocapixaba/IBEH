@@ -94,7 +94,7 @@ export default function App() {
       
       // Seed if empty for demo
       if (snap.empty) {
-        setDoc(doc(collection(db, 'services')), { day: 'Domingo', time: '10:00 AM', description: 'Culto Principal de Adoración' });
+        setDoc(doc(collection(db, 'services')), { day: 'Domingo', time: '10:00 AM', description: 'Servicio Principal de Adoración' });
         setDoc(doc(collection(db, 'services')), { day: 'Miércoles', time: '7:00 PM', description: 'Estudio Bíblico y Oración' });
       }
     });
@@ -138,8 +138,8 @@ export default function App() {
       setGallery(data);
       if (snap.empty) {
         setDoc(doc(collection(db, 'gallery')), {
-          title: 'Culto Dominical de Adoración',
-          eventName: 'Cultos',
+          title: 'Servicio Dominical de Adoración',
+          eventName: 'Servicios',
           date: '24 de Mayo, 2026',
           url: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&q=80&w=1200',
           urls: [

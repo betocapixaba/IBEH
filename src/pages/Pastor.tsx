@@ -12,14 +12,14 @@ export default function Pastor({ settings, currentLang = 'es' }: PastorProps) {
   const pastorBioText = settings.pastorBio || "El Reverendo Juan Carlos Pérez ha dedicado más de tres décadas al servicio del Reino de Dios, enfocándose en la enseñanza profunda de las Escrituras y el cuidado pastoral.\n\nSu ministerio se caracteriza por un compromiso inquebrantable con la Gran Comisión y la formación de discípulos que impacten positivamente su entorno. En Hartford, ha liderado durante diez años una visión de crecimiento espiritual genuino y alcance comunitario, creyendo firmemente que cada persona tiene un propósito divino esperando ser activado en el cuerpo de Cristo.";
 
   return (
-    <div className="pt-28 pb-20 max-w-7xl mx-auto px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <div className="pt-28 pb-20 max-w-5xl mx-auto px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         <motion.div
            initial={{ opacity: 0, scale: 0.95 }}
            animate={{ opacity: 1, scale: 1 }}
-           className="relative group"
+           className="relative group lg:col-span-5 max-w-[280px] lg:max-w-[340px] mx-auto w-full"
         >
-          <div className="relative aspect-[4/5] rounded-[4rem] overflow-hidden bg-slate-100 shadow-strong z-10 transition-transform duration-700 group-hover:scale-[1.02]">
+          <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden bg-slate-100 shadow-strong z-10 transition-transform duration-700 group-hover:scale-[1.02]">
             <img 
               src={settings.pastorImageUrl || "https://images.unsplash.com/photo-1544168190-79c17527004f?auto=format&fit=crop&q=80&w=800"} 
               alt={translateText('Pastor Principal', currentLang)}
@@ -36,7 +36,7 @@ export default function Pastor({ settings, currentLang = 'es' }: PastorProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="space-y-8 relative group"
+          className="lg:col-span-7 space-y-8 relative group"
         >
           <div className="space-y-4">
             <div className="flex items-center gap-3">
